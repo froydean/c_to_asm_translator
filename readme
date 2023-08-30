@@ -1,0 +1,10 @@
+Translator from C-like language to ASM using stack architecture
+
+for compiling compiler:
+
+yacc -d parser.yacc
+lex lexer.l
+g++ lex.yy.c y.tab.c -o compiler
+./compiler <source.c
+
+
