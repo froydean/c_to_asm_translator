@@ -73,7 +73,7 @@ missed specific characters: <> [] # . ~ ~= comments &(other) *(other) , (other k
 "|"						return OR_SINGLE;
 
 [ \t\r\n]+ 					;
-[0-9]+						return NUMBER;
+[0-9]+						{yylval.string = strdup(yytext); return NUMBER;}
 [a-zA-Z_][a-zA-Z0-9_]*				{yylval.string = strdup(yytext); return VAR;}
 [{}()]						return *yytext;
 

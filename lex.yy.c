@@ -1013,7 +1013,7 @@ YY_RULE_SETUP
 case 40:
 YY_RULE_SETUP
 #line 76 "lexer.l"
-return NUMBER;
+{yylval.string = strdup(yytext); return NUMBER;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP

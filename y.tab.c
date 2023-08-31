@@ -75,6 +75,7 @@
 	bool num_error = 0;
 	
 	char * operato = {0x00};
+	char * bin_operato = {0x00};
 	
 	void yyerror(char *s)
 	{
@@ -82,8 +83,21 @@
 		num_error = 1;
 	}
 	
+	void print_oper(){ 
+		if (strcmp(bin_operato, "minus") == 0){printf("SUB\n"); bin_operato = "\0";}
+		else if (strcmp(bin_operato, "plus") == 0){printf("ADD\n"); bin_operato = "\0";}
+		else if (strcmp(bin_operato, "mult") == 0){printf("MULT\n");}
+		else if (strcmp(bin_operato, "div") == 0){printf("DIV\n");}
+		else if (strcmp(bin_operato, "mod") == 0){printf("MOD\n");}
+		else if (strcmp(bin_operato, "xor") == 0){printf("XOR\n");}
+		else if (strcmp(bin_operato, "or_single") == 0){printf("OR_BIT\n");}
+		else if (strcmp(bin_operato, "and_single") == 0){printf("AND_BIT\n");}
+		else if (strcmp(bin_operato, "pushl") == 0){printf("PUSHL\n");}
+		else if (strcmp(bin_operato, "pushr") == 0){printf("PUSHR\n");}
+	}
+	
 	void print_equal(char *s){ 
-		if (strcmp(operato, "equal") == 0){printf("%s\n", s);}
+		if (strcmp(operato, "equal") == 0){}
 		else if (strcmp(operato, "add_eq") == 0){printf("PUSH [%s]\nADD\n", s);}
 		else if (strcmp(operato, "sub_eq") == 0){printf("PUSH [%s]\nSUB\n", s);}
 		else if (strcmp(operato, "mult_eq") == 0){printf("PUSH [%s]\nMULT\n", s);}
@@ -99,7 +113,7 @@
 	
 	
 
-#line 103 "y.tab.c"
+#line 117 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -235,11 +249,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 34 "parser.yacc"
+#line 48 "parser.yacc"
 
 	char * string;
 
-#line 243 "y.tab.c"
+#line 257 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -618,13 +632,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    64,    64,    65,    66,    67,    68,    69,    70,    71,
-      75,    80,    81,    82,    83,    84,    85,    89,    92,    95,
-      96,    97,    98,    99,   100,   101,   102,   106,   107,   111,
-     112,   113,   114,   115,   116,   117,   118,   119,   124,   125,
-     126,   127,   128,   129,   130,   131,   132,   133,   134,   139,
-     140,   141,   142,   143,   144,   149,   150,   151,   152,   153,
-     154,   155,   156,   157,   158,   163,   164
+       0,    78,    78,    79,    80,    81,    82,    83,    84,    85,
+      89,    93,    94,    95,    96,    97,    98,   102,   105,   108,
+     109,   110,   111,   112,   113,   114,   115,   119,   120,   124,
+     125,   126,   127,   128,   129,   130,   131,   132,   137,   138,
+     139,   140,   141,   142,   143,   144,   145,   146,   147,   152,
+     153,   154,   155,   156,   157,   162,   163,   164,   165,   166,
+     167,   168,   169,   170,   171,   176,   177
 };
 #endif
 
@@ -1283,15 +1297,15 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
   switch (yytype)
     {
     case 3: /* NUMBER  */
-#line 41 "parser.yacc"
+#line 55 "parser.yacc"
             {free(((*yyvaluep).string));}
-#line 1289 "y.tab.c"
+#line 1303 "y.tab.c"
         break;
 
     case 4: /* VAR  */
-#line 40 "parser.yacc"
+#line 54 "parser.yacc"
             {free(((*yyvaluep).string));}
-#line 1295 "y.tab.c"
+#line 1309 "y.tab.c"
         break;
 
       default:
@@ -1559,79 +1573,163 @@ yyreduce:
   switch (yyn)
     {
   case 10:
-#line 75 "parser.yacc"
+#line 89 "parser.yacc"
                                          {print_equal((yyvsp[-2].string)); printf("POP %s\n", (yyvsp[-2].string));}
-#line 1565 "y.tab.c"
+#line 1579 "y.tab.c"
+    break;
+
+  case 11:
+#line 93 "parser.yacc"
+                             {print_oper();}
+#line 1585 "y.tab.c"
+    break;
+
+  case 13:
+#line 95 "parser.yacc"
+                           {printf("PUSH %s\n", (yyvsp[-1].string));}
+#line 1591 "y.tab.c"
+    break;
+
+  case 14:
+#line 96 "parser.yacc"
+              {printf("PUSH [%s]\n", (yyvsp[0].string));}
+#line 1597 "y.tab.c"
+    break;
+
+  case 15:
+#line 97 "parser.yacc"
+                 {printf("PUSH %s\n", (yyvsp[0].string));}
+#line 1603 "y.tab.c"
     break;
 
   case 38:
-#line 124 "parser.yacc"
+#line 137 "parser.yacc"
                               {operato = "equal\0";}
-#line 1571 "y.tab.c"
+#line 1609 "y.tab.c"
     break;
 
   case 39:
-#line 125 "parser.yacc"
+#line 138 "parser.yacc"
                                  {operato = "add_eq\0";}
-#line 1577 "y.tab.c"
+#line 1615 "y.tab.c"
     break;
 
   case 40:
-#line 126 "parser.yacc"
+#line 139 "parser.yacc"
                                  {operato = "sub_eq\0";}
-#line 1583 "y.tab.c"
+#line 1621 "y.tab.c"
     break;
 
   case 41:
-#line 127 "parser.yacc"
+#line 140 "parser.yacc"
                                   {operato = "mult_eq\0";}
-#line 1589 "y.tab.c"
+#line 1627 "y.tab.c"
     break;
 
   case 42:
-#line 128 "parser.yacc"
+#line 141 "parser.yacc"
                                  {operato = "div_eq\0";}
-#line 1595 "y.tab.c"
+#line 1633 "y.tab.c"
     break;
 
   case 43:
-#line 129 "parser.yacc"
+#line 142 "parser.yacc"
                                  {operato = "mod_eq\0";}
-#line 1601 "y.tab.c"
+#line 1639 "y.tab.c"
     break;
 
   case 44:
-#line 130 "parser.yacc"
+#line 143 "parser.yacc"
                                    {operato = "pushl_eq\0";}
-#line 1607 "y.tab.c"
+#line 1645 "y.tab.c"
     break;
 
   case 45:
-#line 131 "parser.yacc"
+#line 144 "parser.yacc"
                                    {operato = "pushr_eq\0";}
-#line 1613 "y.tab.c"
+#line 1651 "y.tab.c"
     break;
 
   case 46:
-#line 132 "parser.yacc"
+#line 145 "parser.yacc"
                                  {operato = "xor_eq\0";}
-#line 1619 "y.tab.c"
+#line 1657 "y.tab.c"
     break;
 
   case 47:
-#line 133 "parser.yacc"
+#line 146 "parser.yacc"
                                 {operato = "or_eq\0";}
-#line 1625 "y.tab.c"
+#line 1663 "y.tab.c"
     break;
 
   case 48:
-#line 134 "parser.yacc"
+#line 147 "parser.yacc"
                                  {operato = "and_eq\0";}
-#line 1631 "y.tab.c"
+#line 1669 "y.tab.c"
+    break;
+
+  case 55:
+#line 162 "parser.yacc"
+                      {bin_operato = "minus\0";}
+#line 1675 "y.tab.c"
+    break;
+
+  case 56:
+#line 163 "parser.yacc"
+                       {bin_operato = "plus\0";}
+#line 1681 "y.tab.c"
+    break;
+
+  case 57:
+#line 164 "parser.yacc"
+                       {bin_operato = "mult\0";}
+#line 1687 "y.tab.c"
+    break;
+
+  case 58:
+#line 165 "parser.yacc"
+                      {bin_operato = "div\0";}
+#line 1693 "y.tab.c"
+    break;
+
+  case 59:
+#line 166 "parser.yacc"
+                      {bin_operato = "mod\0";}
+#line 1699 "y.tab.c"
+    break;
+
+  case 60:
+#line 167 "parser.yacc"
+                      {bin_operato = "xor\0";}
+#line 1705 "y.tab.c"
+    break;
+
+  case 61:
+#line 168 "parser.yacc"
+                            {bin_operato = "or_single\0";}
+#line 1711 "y.tab.c"
+    break;
+
+  case 62:
+#line 169 "parser.yacc"
+                             {bin_operato = "and_single\0";}
+#line 1717 "y.tab.c"
+    break;
+
+  case 63:
+#line 170 "parser.yacc"
+                        {bin_operato = "pushl\0";}
+#line 1723 "y.tab.c"
+    break;
+
+  case 64:
+#line 171 "parser.yacc"
+                        {bin_operato = "pushr\0";}
+#line 1729 "y.tab.c"
     break;
 
 
-#line 1635 "y.tab.c"
+#line 1733 "y.tab.c"
 
       default: break;
     }
@@ -1863,7 +1961,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 167 "parser.yacc"
+#line 180 "parser.yacc"
 
 
 

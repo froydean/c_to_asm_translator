@@ -6,6 +6,7 @@
 	bool num_error = 0;
 	
 	char * operato = {0x00};
+	char * bin_operato = {0x00};
 	
 	void yyerror(char *s)
 	{
@@ -13,8 +14,21 @@
 		num_error = 1;
 	}
 	
+	void print_oper(){ 
+		if (strcmp(bin_operato, "minus") == 0){printf("SUB\n"); bin_operato = "\0";}
+		else if (strcmp(bin_operato, "plus") == 0){printf("ADD\n"); bin_operato = "\0";}
+		else if (strcmp(bin_operato, "mult") == 0){printf("MULT\n");}
+		else if (strcmp(bin_operato, "div") == 0){printf("DIV\n");}
+		else if (strcmp(bin_operato, "mod") == 0){printf("MOD\n");}
+		else if (strcmp(bin_operato, "xor") == 0){printf("XOR\n");}
+		else if (strcmp(bin_operato, "or_single") == 0){printf("OR_BIT\n");}
+		else if (strcmp(bin_operato, "and_single") == 0){printf("AND_BIT\n");}
+		else if (strcmp(bin_operato, "pushl") == 0){printf("PUSHL\n");}
+		else if (strcmp(bin_operato, "pushr") == 0){printf("PUSHR\n");}
+	}
+	
 	void print_equal(char *s){ 
-		if (strcmp(operato, "equal") == 0){printf("%s\n", s);}
+		if (strcmp(operato, "equal") == 0){}
 		else if (strcmp(operato, "add_eq") == 0){printf("PUSH [%s]\nADD\n", s);}
 		else if (strcmp(operato, "sub_eq") == 0){printf("PUSH [%s]\nSUB\n", s);}
 		else if (strcmp(operato, "mult_eq") == 0){printf("PUSH [%s]\nMULT\n", s);}
@@ -75,9 +89,8 @@ assignment:
 		VAR assign_operator expr {print_equal($1); printf("POP %s\n", $1);}
 		;
 
-
-expr:
-	expr bin_opertr expr
+expr: 
+	expr bin_opertr expr {print_oper();}
 	| unary_opertr VAR
 	| VAR unary_opertr {printf("PUSH %s\n", $1);}
 	| VAR {printf("PUSH [%s]\n", $1);}
@@ -146,16 +159,16 @@ comparison_operator:
 
 bin_opertr:
 /*"+"	"*"	"/"	"%"	"^"	"|"	"-"	"&"	">>"	"<<"*/
-		MINUS
-		| PLUS
-		| MULT
-		| DIV
-		| MOD
-		| XOR
-		| OR_SINGLE
-		| AND_SINGLE
-		| PUSHL
-		| PUSHR
+		MINUS {bin_operato = "minus\0";}
+		| PLUS {bin_operato = "plus\0";}
+		| MULT {bin_operato = "mult\0";}
+		| DIV {bin_operato = "div\0";}
+		| MOD {bin_operato = "mod\0";}
+		| XOR {bin_operato = "xor\0";}
+		| OR_SINGLE {bin_operato = "or_single\0";}
+		| AND_SINGLE {bin_operato = "and_single\0";}
+		| PUSHL {bin_operato = "pushl\0";}
+		| PUSHR {bin_operato = "pushr\0";}
 		;
 
 unary_opertr:
