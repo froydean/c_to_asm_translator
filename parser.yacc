@@ -1,12 +1,71 @@
 %{
 	#include<iostream>
 	#include <string.h>
+	#include <vector>
 	extern int yylineno;
 	extern int yylex();
 	bool num_error = 0;
 	
 	char * operato = {0x00};
-	char * bin_operato = {0x00};
+	//char * bin_operato = {0x00};
+	
+	std::string print_oper(std::string operr);
+	
+	/*
+	std::string hehe(std::string ope){
+		if (strcmp(ope.c_str(), "mult")==0)return "SUB";
+		return "ADD";
+	}
+	
+	void p(){
+		std::vector <std::string> bracket_vars;
+		bracket_vars.push_back("div");
+		bracket_vars.push_back("mult");
+		std::cout << bracket_vars[1]<< std::endl;
+		std::cout << hehe(bracket_vars[0])<< std::endl;
+		printf("%s\n", bracket_vars[0].c_str());
+	}
+	*/
+
+	std::vector <std::string> all_vars_in_expr;
+	std::vector <std::string> all_opers_in_expr;
+	std::vector <std::string> bracket_vars; //queue () vars
+	std::vector <std::string> bracket_opers; //queue () opers
+	std::vector <std::string> mult_vars; //queue * / vars
+	std::vector <std::string> mult_opers; //queue * / opers
+	std::vector <std::string> plus_vars; //queue + - vars
+	std::vector <std::string> plus_opers;//queue + - opers
+	
+	void queue_distrib(){
+		//TO DO distribution
+	}
+	
+	void print_expr(){
+		queue_distrib();
+		int k = 0; //pointer through queue of vars
+		
+		for (int i = 0; i < bracket_opers.size(); i++){
+			printf("PUSH %s\nPUSH %s\n", bracket_vars[k].c_str(), bracket_vars[k+1].c_str());
+			std::cout << print_oper(bracket_opers[i])<< std::endl;
+			k+=2;
+		}
+		
+		k = 0;
+		for (int i = 0; i < mult_opers.size(); i++){
+			printf("PUSH %s\nPUSH %s\n", mult_vars[k].c_str(), mult_vars[k+1].c_str());
+			std::cout << print_oper(mult_opers[i])<< std::endl;
+			k+=2;
+		}
+		
+		k = 0;
+		for (int i = 0; i < plus_opers.size(); i++){
+			printf("PUSH %s\nPUSH %s\n", plus_vars[k].c_str(), plus_vars[k+1].c_str());
+			std::cout << print_oper(plus_opers[i])<< std::endl;
+			k+=2;
+		}
+		//mb clear all expr queues
+	}
+	
 	
 	void yyerror(char *s)
 	{
@@ -14,17 +73,18 @@
 		num_error = 1;
 	}
 	
-	void print_oper(){ 
-		if (strcmp(bin_operato, "minus") == 0){printf("SUB\n"); bin_operato = "\0";}
-		else if (strcmp(bin_operato, "plus") == 0){printf("ADD\n"); bin_operato = "\0";}
-		else if (strcmp(bin_operato, "mult") == 0){printf("MULT\n");}
-		else if (strcmp(bin_operato, "div") == 0){printf("DIV\n");}
-		else if (strcmp(bin_operato, "mod") == 0){printf("MOD\n");}
-		else if (strcmp(bin_operato, "xor") == 0){printf("XOR\n");}
-		else if (strcmp(bin_operato, "or_single") == 0){printf("OR_BIT\n");}
-		else if (strcmp(bin_operato, "and_single") == 0){printf("AND_BIT\n");}
-		else if (strcmp(bin_operato, "pushl") == 0){printf("PUSHL\n");}
-		else if (strcmp(bin_operato, "pushr") == 0){printf("PUSHR\n");}
+	std::string /*void*/ print_oper(std::string operr){
+		bin_operato = operr.c_str(); 
+		if (strcmp(bin_operato, "minus") == 0){/*printf("SUB\n");*/ return "SUB";}
+		else if (strcmp(bin_operato, "plus") == 0){return "ADD";}
+		else if (strcmp(bin_operato, "mult") == 0){return "MULT";}
+		else if (strcmp(bin_operato, "div") == 0){return "DIV";}
+		else if (strcmp(bin_operato, "mod") == 0){return "MOD";}
+		else if (strcmp(bin_operato, "xor") == 0){return "XOR";}
+		else if (strcmp(bin_operato, "or_single") == 0){return "OR_BIT";}
+		else if (strcmp(bin_operato, "and_single") == 0){return "AND_BIT";}
+		else if (strcmp(bin_operato, "pushl") == 0){return "PUSHL";}
+		else if (strcmp(bin_operato, "pushr") == 0){return "PUSHR";}
 	}
 	
 	void print_equal(char *s){ 
@@ -86,9 +146,14 @@ command:
 		;
 
 assignment:
-		VAR assign_operator expr {print_equal($1); printf("POP %s\n", $1);}
+		VAR assign_operator expr {print_expr(); print_equal($1); printf("POP %s\n", $1); p();}
 		;
+/*
+expr1:
+	expr {printf("HELLO\n");}
+	;
 
+*/
 expr: 
 	expr bin_opertr expr {print_oper();}
 	| unary_opertr VAR
