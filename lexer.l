@@ -30,8 +30,8 @@ missed specific characters: <> [] # . ~ ~= comments &(other) *(other) , (other k
 "return"					return RETURN;
 "print"					return PRINT;
 
-"++" 						return INC;
-"--"						return DEC;
+"++" 						{yylval.string = strdup(yytext); return INC;}
+"--"						{yylval.string = strdup(yytext); return DEC;}
 
 "+="						return ADD_EQ;
 "-="						return SUB_EQ;

@@ -51,13 +51,13 @@ extern int yydebug;
   {
     NUMBER = 258,
     VAR = 259,
-    IF = 260,
-    ELSE = 261,
-    WHILE = 262,
-    RETURN = 263,
-    PRINT = 264,
-    INC = 265,
-    DEC = 266,
+    INC = 260,
+    DEC = 261,
+    IF = 262,
+    ELSE = 263,
+    WHILE = 264,
+    RETURN = 265,
+    PRINT = 266,
     ADD_EQ = 267,
     SUB_EQ = 268,
     MULT_EQ = 269,
@@ -94,13 +94,13 @@ extern int yydebug;
 /* Tokens.  */
 #define NUMBER 258
 #define VAR 259
-#define IF 260
-#define ELSE 261
-#define WHILE 262
-#define RETURN 263
-#define PRINT 264
-#define INC 265
-#define DEC 266
+#define INC 260
+#define DEC 261
+#define IF 262
+#define ELSE 263
+#define WHILE 264
+#define RETURN 265
+#define PRINT 266
 #define ADD_EQ 267
 #define SUB_EQ 268
 #define MULT_EQ 269
@@ -137,7 +137,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 138 "parser.yacc"
+#line 49 "parser.yacc"
 
 	char * string;
 

@@ -842,12 +842,12 @@ return PRINT;
 case 6:
 YY_RULE_SETUP
 #line 33 "lexer.l"
-return INC;
+{yylval.string = strdup(yytext); return INC;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 34 "lexer.l"
-return DEC;
+{yylval.string = strdup(yytext); return DEC;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
