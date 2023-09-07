@@ -38,10 +38,33 @@
 	
 	void queue_distrib(){
 		//TO DO distribution
+		
+		int k = 0; //pointer through queue of vars
+		for (int i = 0; i < all_opers_in_expr.size(); i++){
+		
+			std::string tmp1 = all_vars_in_expr[k];
+			std::string tmp2 = all_vars_in_expr[k+1];
+			k += 2;
+			
+			//add more than */+- and also ++ think about it
+			if (all_opers_in_expr[i] == "mult" || all_opers_in_expr[i] == "div"){
+				mult_opers.push_back(all_opers_in_expr[i]);
+				mult_vars.push_back(tmp1);
+				mult_vars.push_back(tmp2);
+			}
+			
+			if (all_opers_in_expr[i] == "minus" || all_opers_in_expr[i] == "plus"){
+				plus_opers.push_back(all_opers_in_expr[i]);
+				plus_vars.push_back(tmp1);
+				plus_vars.push_back(tmp2);
+			}
+		}
 	}
 	
 	void print_expr(){
+	
 		queue_distrib();
+		
 		int k = 0; //pointer through queue of vars
 		
 		for (int i = 0; i < bracket_opers.size(); i++){
@@ -64,6 +87,13 @@
 			k+=2;
 		}
 		//mb clear all expr queues
+		for (int i = 0; i < all_opers_in_expr.size(); i++){
+			std::cout<<all_opers_in_expr[i]<<std::endl;
+		}
+		for (int i = 0; i < all_vars_in_expr.size(); i++){
+			std::cout<<all_vars_in_expr[i]<<std::endl;
+		}
+		
 	}
 	
 	
@@ -73,8 +103,8 @@
 		num_error = 1;
 	}
 	
-	std::string /*void*/ print_oper(std::string operr){
-		bin_operato = operr.c_str(); 
+	std::string /*void*/ print_oper(std::string operr){ //extra, could be just div immidiately SUB instead minus
+		const char * bin_operato = operr.c_str(); 
 		if (strcmp(bin_operato, "minus") == 0){/*printf("SUB\n");*/ return "SUB";}
 		else if (strcmp(bin_operato, "plus") == 0){return "ADD";}
 		else if (strcmp(bin_operato, "mult") == 0){return "MULT";}
@@ -146,7 +176,7 @@ command:
 		;
 
 assignment:
-		VAR assign_operator expr {print_expr(); print_equal($1); printf("POP %s\n", $1); p();}
+		VAR assign_operator expr {print_expr(); print_equal($1); printf("POP %s\n", $1); /*p();*/}
 		;
 /*
 expr1:
@@ -155,11 +185,11 @@ expr1:
 
 */
 expr: 
-	expr bin_opertr expr {print_oper();}
+	expr bin_opertr expr /*{print_oper();}*/
 	| unary_opertr VAR
 	| VAR unary_opertr {printf("PUSH %s\n", $1);}
-	| VAR {printf("PUSH [%s]\n", $1);}
-	| NUMBER {printf("PUSH %s\n", $1);}
+	| VAR /*{printf("PUSH [%s]\n", $1);}*/ {all_vars_in_expr.push_back($1);}
+	| NUMBER /*{printf("PUSH %s\n", $1);}*/ {all_vars_in_expr.push_back($1);}
 	| '(' expr ')'
 	;
 
@@ -224,16 +254,16 @@ comparison_operator:
 
 bin_opertr:
 /*"+"	"*"	"/"	"%"	"^"	"|"	"-"	"&"	">>"	"<<"*/
-		MINUS {bin_operato = "minus\0";}
-		| PLUS {bin_operato = "plus\0";}
-		| MULT {bin_operato = "mult\0";}
-		| DIV {bin_operato = "div\0";}
-		| MOD {bin_operato = "mod\0";}
-		| XOR {bin_operato = "xor\0";}
-		| OR_SINGLE {bin_operato = "or_single\0";}
-		| AND_SINGLE {bin_operato = "and_single\0";}
-		| PUSHL {bin_operato = "pushl\0";}
-		| PUSHR {bin_operato = "pushr\0";}
+		MINUS {all_opers_in_expr.push_back("minus");}
+		| PLUS {all_opers_in_expr.push_back("plus");}
+		| MULT {all_opers_in_expr.push_back("mult");}
+		| DIV {all_opers_in_expr.push_back("div");}
+		| MOD {all_opers_in_expr.push_back("mod");}
+		| XOR {all_opers_in_expr.push_back("xor");}
+		| OR_SINGLE {all_opers_in_expr.push_back("or_single");}
+		| AND_SINGLE {all_opers_in_expr.push_back("and_single");}
+		| PUSHL {all_opers_in_expr.push_back("pushl");}
+		| PUSHR {all_opers_in_expr.push_back("pushr");}
 		;
 
 unary_opertr:
