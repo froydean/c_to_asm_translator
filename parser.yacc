@@ -2,6 +2,8 @@
 	#include<iostream>
 	#include <string.h>
 	#include <vector>
+	#include <stack>
+	
 	extern int yylineno;
 	extern int yylex();
 	bool num_error = 0;
@@ -9,11 +11,15 @@
 	char * operato = {0x00};
 
 	std::vector <std::string> express;
+
+	std::vector <std::string> express_ppn;
+	std::stack <std::string> stack_t;
 	
 	void p(){
 		for (auto i = express.begin(); i != express.end(); ++i){
 			std::cout<< *i << std::endl;
 		}
+		std::cout<<"ban"<<std::endl;
 	}
 	
 	void ex_push_back(char *s){
@@ -42,15 +48,111 @@
 		else if (strcmp(operato, "and_eq") == 0){printf("PUSH [%s]\nAND\n", s);}
 	}
 	
-	void translate_to_polish_note(){
-		
-	}
 	
+	int prior(std::string op) {
+		if (op == "(") return 1;
+		if (op == "OR") return 2;
+		if (op == "XOR") return 3;
+		if (op == "AND") return 4;
+		if (op == "PUSHL" || op == "PUSHR") return 5;
+		if (op == "ADD" || op == "SUB") return 6;
+		if (op == "DIV" || op == "MULT") return 7;
+		return 0;
+	}
+
+	bool is_operator(std::string cur) {
+		if (cur == "ADD" || cur == "SUB" || cur == "DIV" || cur == "MULT") return true;
+		if (cur == "MOD" || cur == "AND" || cur == "XOR" || cur == "OR") return true;
+		if (cur == "PUSHL" || cur == "PUSHR") return true;
+		if (cur == "INC" || cur == "DEC") return true;
+		return false;
+	}
+
+	void convert_to_ppn() {
+
+		for (int i = 0; i < express.size(); i++) {
+		
+			std::string cur_s = express[i];
+		
+			/*std::string tmp_postfix;
+
+			
+			
+			if (cur_s == "++" or cur_s == "--"){
+				//prefix
+				if (!is_operator(express[i+1]) && express[i+1] != "(" && express[i+1]) != ")"){ //if var or number
+					if (cur_s == "++"){
+						express_ppn.push_back("INC");
+					}
+					else {
+						express_ppn.push_back("DEC");
+					}
+					
+				}
+				//postfix
+				else{
+				//new
+					tmp_postfix = cur_s;
+				}
+				continue;
+			}*/
+			
+			if (!is_operator(cur_s) && cur_s != "(" && cur_s != ")") { //if var or number
+				express_ppn.push_back(cur_s);
+				continue;
+			}
+			
+
+			if (cur_s == "(") {
+				stack_t.push(cur_s);
+				continue;
+			}
+			if (is_operator(cur_s)) {
+
+				while (!stack_t.empty() && prior(cur_s) <= prior(stack_t.top())) {
+					std::string tmp = stack_t.top();
+					stack_t.pop();
+					express_ppn.push_back(tmp);
+				}
+				if (stack_t.empty() || prior(cur_s) > prior(stack_t.top())) { //why only top
+					stack_t.push(cur_s);
+				}
+				continue;
+			}
+			if (cur_s == ")") {
+				std::string tmp = stack_t.top();
+				stack_t.pop();
+				while (tmp != "(") {
+					express_ppn.push_back(tmp);
+					tmp = stack_t.top();
+					stack_t.pop();
+				}
+				continue;
+			}
+		}
+		while (!stack_t.empty()) {
+			std::string tmp = stack_t.top();
+			stack_t.pop();
+			express_ppn.push_back(tmp);
+		}
+	}
+
+
 	void print_expr(){
 		//vector "express" to reverse polish notation
-		translate_to_polish_note();
+		convert_to_ppn();
 		
 		//print each element "ab+" as "push a push b add"
+		
+		for (auto i = express_ppn.begin(); i != express_ppn.end(); ++i) {
+			if (is_operator(*i)){
+				std::cout<<*i<<std::endl;
+			}
+			else { 	
+				std::cout<<"PUSH "<<*i << std::endl;
+			}
+		}
+		
 		
 	}
 
@@ -100,7 +202,7 @@ command:
 		;
 
 assignment:
-		VAR assign_operator expr {print_expr(); print_equal($1); printf("POP %s\n", $1); p();}
+		VAR assign_operator expr {print_expr(); print_equal($1); printf("POP %s\n", $1); /*p();*/}
 		;
 
 expr: 

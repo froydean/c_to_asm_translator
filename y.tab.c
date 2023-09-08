@@ -71,6 +71,8 @@
 	#include<iostream>
 	#include <string.h>
 	#include <vector>
+	#include <stack>
+	
 	extern int yylineno;
 	extern int yylex();
 	bool num_error = 0;
@@ -78,11 +80,15 @@
 	char * operato = {0x00};
 
 	std::vector <std::string> express;
+
+	std::vector <std::string> express_ppn;
+	std::stack <std::string> stack_t;
 	
 	void p(){
 		for (auto i = express.begin(); i != express.end(); ++i){
 			std::cout<< *i << std::endl;
 		}
+		std::cout<<"ban"<<std::endl;
 	}
 	
 	void ex_push_back(char *s){
@@ -110,11 +116,93 @@
 		else if (strcmp(operato, "or_eq") == 0){printf("PUSH [%s]\nOR\n", s);}
 		else if (strcmp(operato, "and_eq") == 0){printf("PUSH [%s]\nAND\n", s);}
 	}
+	
+	
+	int prior(std::string op) {
+		if (op == "(") return 1;
+		if (op == "OR") return 2;
+		if (op == "XOR") return 3;
+		if (op == "AND") return 4;
+		if (op == "PUSHL" || op == "PUSHR") return 5;
+		if (op == "ADD" || op == "SUB") return 6;
+		if (op == "DIV" || op == "MULT") return 7;
+		return 0;
+	}
+
+	bool is_operator(std::string cur) {
+		if (cur == "ADD" || cur == "SUB" || cur == "DIV" || cur == "MULT") return true;
+		if (cur == "MOD" || cur == "AND" || cur == "XOR" || cur == "OR") return true;
+		if (cur == "PUSHL" || cur == "PUSHR") return true;
+		return false;
+	}
+
+	void convert_to_ppn() {
+
+		for (int i = 0; i < express.size(); i++) {
+
+			std::string cur_s = express[i];
+			if (!is_operator(cur_s) && cur_s != "(" && cur_s != ")") { //if var or number
+				express_ppn.push_back(cur_s);
+				continue;
+			}
+
+			if (cur_s == "(") {
+				stack_t.push(cur_s);
+				continue;
+			}
+			if (is_operator(cur_s)) {
+
+				while (!stack_t.empty() && prior(cur_s) <= prior(stack_t.top())) {
+					std::string tmp = stack_t.top();
+					stack_t.pop();
+					express_ppn.push_back(tmp);
+				}
+				if (stack_t.empty() || prior(cur_s) > prior(stack_t.top())) { //why only top
+					stack_t.push(cur_s);
+				}
+				continue;
+			}
+			if (cur_s == ")") {
+				std::string tmp = stack_t.top();
+				stack_t.pop();
+				while (tmp != "(") {
+					express_ppn.push_back(tmp);
+					tmp = stack_t.top();
+					stack_t.pop();
+				}
+				continue;
+			}
+		}
+		while (!stack_t.empty()) {
+			std::string tmp = stack_t.top();
+			stack_t.pop();
+			express_ppn.push_back(tmp);
+		}
+	}
+
+
+	void print_expr(){
+		//vector "express" to reverse polish notation
+		convert_to_ppn();
+		
+		//print each element "ab+" as "push a push b add"
+		
+		for (auto i = express_ppn.begin(); i != express_ppn.end(); ++i) {
+			if (is_operator(*i)){
+				std::cout<<*i<<std::endl;
+			}
+			else { 	
+				std::cout<<"PUSH "<<*i << std::endl;
+			}
+		}
+		
+		
+	}
 
 
 
 
-#line 118 "y.tab.c"
+#line 206 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -250,11 +338,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 49 "parser.yacc"
+#line 137 "parser.yacc"
 
 	char * string;
 
-#line 258 "y.tab.c"
+#line 346 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -631,15 +719,15 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_int16 yyrline[] =
 {
-       0,    80,    80,    81,    82,    83,    84,    85,    86,    87,
-      91,    95,    96,    97,    98,    99,   100,   101,   102,   102,
-     106,   109,   112,   113,   114,   115,   116,   117,   118,   119,
-     122,   123,   127,   128,   129,   130,   131,   132,   133,   134,
-     135,   140,   141,   142,   143,   144,   145,   146,   147,   148,
-     149,   150,   155,   156,   157,   158,   159,   160,   165,   166,
-     167,   168,   169,   170,   171,   172,   173,   174,   179,   180
+       0,   168,   168,   169,   170,   171,   172,   173,   174,   175,
+     179,   183,   184,   185,   186,   187,   188,   189,   190,   190,
+     194,   197,   200,   201,   202,   203,   204,   205,   206,   207,
+     210,   211,   215,   216,   217,   218,   219,   220,   221,   222,
+     223,   228,   229,   230,   231,   232,   233,   234,   235,   236,
+     237,   238,   243,   244,   245,   246,   247,   248,   253,   254,
+     255,   256,   257,   258,   259,   260,   261,   262,   267,   268
 };
 #endif
 
@@ -1294,27 +1382,27 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
   switch (yytype)
     {
     case 3: /* NUMBER  */
-#line 56 "parser.yacc"
+#line 144 "parser.yacc"
             {free(((*yyvaluep).string));}
-#line 1300 "y.tab.c"
+#line 1388 "y.tab.c"
         break;
 
     case 4: /* VAR  */
-#line 55 "parser.yacc"
+#line 143 "parser.yacc"
             {free(((*yyvaluep).string));}
-#line 1306 "y.tab.c"
+#line 1394 "y.tab.c"
         break;
 
     case 5: /* INC  */
-#line 57 "parser.yacc"
+#line 145 "parser.yacc"
             {free(((*yyvaluep).string));}
-#line 1312 "y.tab.c"
+#line 1400 "y.tab.c"
         break;
 
     case 6: /* DEC  */
-#line 58 "parser.yacc"
+#line 146 "parser.yacc"
             {free(((*yyvaluep).string));}
-#line 1318 "y.tab.c"
+#line 1406 "y.tab.c"
         break;
 
       default:
@@ -1582,187 +1670,187 @@ yyreduce:
   switch (yyn)
     {
   case 10:
-#line 91 "parser.yacc"
-                                         {print_equal((yyvsp[-2].string)); printf("POP %s\n", (yyvsp[-2].string)); p();}
-#line 1588 "y.tab.c"
+#line 179 "parser.yacc"
+                                         {print_expr(); print_equal((yyvsp[-2].string)); printf("POP %s\n", (yyvsp[-2].string)); /*p();*/}
+#line 1676 "y.tab.c"
     break;
 
   case 12:
-#line 96 "parser.yacc"
+#line 184 "parser.yacc"
                   {express.push_back((yyvsp[-1].string)); express.push_back((yyvsp[0].string)); }
-#line 1594 "y.tab.c"
+#line 1682 "y.tab.c"
     break;
 
   case 13:
-#line 97 "parser.yacc"
+#line 185 "parser.yacc"
                   {express.push_back((yyvsp[-1].string)); express.push_back((yyvsp[0].string)); }
-#line 1600 "y.tab.c"
+#line 1688 "y.tab.c"
     break;
 
   case 14:
-#line 98 "parser.yacc"
+#line 186 "parser.yacc"
                   {express.push_back((yyvsp[-1].string)); express.push_back((yyvsp[0].string)); }
-#line 1606 "y.tab.c"
+#line 1694 "y.tab.c"
     break;
 
   case 15:
-#line 99 "parser.yacc"
+#line 187 "parser.yacc"
                   {express.push_back((yyvsp[-1].string)); express.push_back((yyvsp[0].string)); }
-#line 1612 "y.tab.c"
+#line 1700 "y.tab.c"
     break;
 
   case 16:
-#line 100 "parser.yacc"
+#line 188 "parser.yacc"
               {ex_push_back((yyvsp[0].string));}
-#line 1618 "y.tab.c"
+#line 1706 "y.tab.c"
     break;
 
   case 17:
-#line 101 "parser.yacc"
+#line 189 "parser.yacc"
                  {ex_push_back((yyvsp[0].string));}
-#line 1624 "y.tab.c"
+#line 1712 "y.tab.c"
     break;
 
   case 18:
-#line 102 "parser.yacc"
+#line 190 "parser.yacc"
               {express.push_back("(");}
-#line 1630 "y.tab.c"
+#line 1718 "y.tab.c"
     break;
 
   case 19:
-#line 102 "parser.yacc"
+#line 190 "parser.yacc"
                                                  {express.push_back(")");}
-#line 1636 "y.tab.c"
+#line 1724 "y.tab.c"
     break;
 
   case 41:
-#line 140 "parser.yacc"
+#line 228 "parser.yacc"
                               {operato = "equal\0";}
-#line 1642 "y.tab.c"
+#line 1730 "y.tab.c"
     break;
 
   case 42:
-#line 141 "parser.yacc"
+#line 229 "parser.yacc"
                                  {operato = "add_eq\0";}
-#line 1648 "y.tab.c"
+#line 1736 "y.tab.c"
     break;
 
   case 43:
-#line 142 "parser.yacc"
+#line 230 "parser.yacc"
                                  {operato = "sub_eq\0";}
-#line 1654 "y.tab.c"
+#line 1742 "y.tab.c"
     break;
 
   case 44:
-#line 143 "parser.yacc"
+#line 231 "parser.yacc"
                                   {operato = "mult_eq\0";}
-#line 1660 "y.tab.c"
+#line 1748 "y.tab.c"
     break;
 
   case 45:
-#line 144 "parser.yacc"
+#line 232 "parser.yacc"
                                  {operato = "div_eq\0";}
-#line 1666 "y.tab.c"
+#line 1754 "y.tab.c"
     break;
 
   case 46:
-#line 145 "parser.yacc"
+#line 233 "parser.yacc"
                                  {operato = "mod_eq\0";}
-#line 1672 "y.tab.c"
+#line 1760 "y.tab.c"
     break;
 
   case 47:
-#line 146 "parser.yacc"
+#line 234 "parser.yacc"
                                    {operato = "pushl_eq\0";}
-#line 1678 "y.tab.c"
+#line 1766 "y.tab.c"
     break;
 
   case 48:
-#line 147 "parser.yacc"
+#line 235 "parser.yacc"
                                    {operato = "pushr_eq\0";}
-#line 1684 "y.tab.c"
+#line 1772 "y.tab.c"
     break;
 
   case 49:
-#line 148 "parser.yacc"
+#line 236 "parser.yacc"
                                  {operato = "xor_eq\0";}
-#line 1690 "y.tab.c"
+#line 1778 "y.tab.c"
     break;
 
   case 50:
-#line 149 "parser.yacc"
+#line 237 "parser.yacc"
                                 {operato = "or_eq\0";}
-#line 1696 "y.tab.c"
+#line 1784 "y.tab.c"
     break;
 
   case 51:
-#line 150 "parser.yacc"
+#line 238 "parser.yacc"
                                  {operato = "and_eq\0";}
-#line 1702 "y.tab.c"
+#line 1790 "y.tab.c"
     break;
 
   case 58:
-#line 165 "parser.yacc"
+#line 253 "parser.yacc"
                       {express.push_back("SUB");}
-#line 1708 "y.tab.c"
+#line 1796 "y.tab.c"
     break;
 
   case 59:
-#line 166 "parser.yacc"
+#line 254 "parser.yacc"
                        {express.push_back("ADD");}
-#line 1714 "y.tab.c"
+#line 1802 "y.tab.c"
     break;
 
   case 60:
-#line 167 "parser.yacc"
+#line 255 "parser.yacc"
                        {express.push_back("MULT");}
-#line 1720 "y.tab.c"
+#line 1808 "y.tab.c"
     break;
 
   case 61:
-#line 168 "parser.yacc"
+#line 256 "parser.yacc"
                       {express.push_back("DIV");}
-#line 1726 "y.tab.c"
+#line 1814 "y.tab.c"
     break;
 
   case 62:
-#line 169 "parser.yacc"
+#line 257 "parser.yacc"
                       {express.push_back("MOD");}
-#line 1732 "y.tab.c"
+#line 1820 "y.tab.c"
     break;
 
   case 63:
-#line 170 "parser.yacc"
+#line 258 "parser.yacc"
                       {express.push_back("XOR");}
-#line 1738 "y.tab.c"
+#line 1826 "y.tab.c"
     break;
 
   case 64:
-#line 171 "parser.yacc"
+#line 259 "parser.yacc"
                             {express.push_back("OR");}
-#line 1744 "y.tab.c"
+#line 1832 "y.tab.c"
     break;
 
   case 65:
-#line 172 "parser.yacc"
+#line 260 "parser.yacc"
                              {express.push_back("AND");}
-#line 1750 "y.tab.c"
+#line 1838 "y.tab.c"
     break;
 
   case 66:
-#line 173 "parser.yacc"
+#line 261 "parser.yacc"
                         {express.push_back("PUSHL");}
-#line 1756 "y.tab.c"
+#line 1844 "y.tab.c"
     break;
 
   case 67:
-#line 174 "parser.yacc"
+#line 262 "parser.yacc"
                         {express.push_back("PUSHR");}
-#line 1762 "y.tab.c"
+#line 1850 "y.tab.c"
     break;
 
 
-#line 1766 "y.tab.c"
+#line 1854 "y.tab.c"
 
       default: break;
     }
@@ -1994,7 +2082,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 183 "parser.yacc"
+#line 271 "parser.yacc"
 
 
 
