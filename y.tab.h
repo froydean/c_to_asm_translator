@@ -51,93 +51,93 @@ extern int yydebug;
   {
     NUMBER = 258,
     VAR = 259,
-    INC = 260,
-    DEC = 261,
-    IF = 262,
-    ELSE = 263,
-    WHILE = 264,
-    RETURN = 265,
-    PRINT = 266,
-    ADD_EQ = 267,
-    SUB_EQ = 268,
-    MULT_EQ = 269,
-    DIV_EQ = 270,
-    MOD_EQ = 271,
-    MORE_EQ = 272,
-    LESS_EQ = 273,
-    NOT_EQUAL = 274,
-    EQUAL_DOUBLE = 275,
-    PUSHL_EQ = 276,
-    PUSHR_EQ = 277,
-    PUSHL = 278,
-    PUSHR = 279,
-    MORE = 280,
-    LESS = 281,
-    XOR_EQ = 282,
-    OR_EQ = 283,
-    AND_EQ = 284,
-    AND = 285,
-    OR = 286,
-    AND_SINGLE = 287,
-    MINUS = 288,
-    SEMICOLON = 289,
-    EQUAL = 290,
-    PLUS = 291,
-    MULT = 292,
-    DIV = 293,
-    NOT = 294,
-    MOD = 295,
-    XOR = 296,
-    OR_SINGLE = 297
+    IF = 260,
+    ELSE = 261,
+    WHILE = 262,
+    RETURN = 263,
+    PRINT = 264,
+    ADD_EQ = 265,
+    SUB_EQ = 266,
+    MULT_EQ = 267,
+    DIV_EQ = 268,
+    MOD_EQ = 269,
+    MORE_EQ = 270,
+    LESS_EQ = 271,
+    NOT_EQUAL = 272,
+    EQUAL_DOUBLE = 273,
+    PUSHL_EQ = 274,
+    PUSHR_EQ = 275,
+    PUSHL = 276,
+    PUSHR = 277,
+    MORE = 278,
+    LESS = 279,
+    XOR_EQ = 280,
+    OR_EQ = 281,
+    AND_EQ = 282,
+    AND = 283,
+    OR = 284,
+    AND_SINGLE = 285,
+    MINUS = 286,
+    SEMICOLON = 287,
+    EQUAL = 288,
+    PLUS = 289,
+    MULT = 290,
+    DIV = 291,
+    NOT = 292,
+    MOD = 293,
+    XOR = 294,
+    OR_SINGLE = 295,
+    INC = 296,
+    DEC = 297
   };
 #endif
 /* Tokens.  */
 #define NUMBER 258
 #define VAR 259
-#define INC 260
-#define DEC 261
-#define IF 262
-#define ELSE 263
-#define WHILE 264
-#define RETURN 265
-#define PRINT 266
-#define ADD_EQ 267
-#define SUB_EQ 268
-#define MULT_EQ 269
-#define DIV_EQ 270
-#define MOD_EQ 271
-#define MORE_EQ 272
-#define LESS_EQ 273
-#define NOT_EQUAL 274
-#define EQUAL_DOUBLE 275
-#define PUSHL_EQ 276
-#define PUSHR_EQ 277
-#define PUSHL 278
-#define PUSHR 279
-#define MORE 280
-#define LESS 281
-#define XOR_EQ 282
-#define OR_EQ 283
-#define AND_EQ 284
-#define AND 285
-#define OR 286
-#define AND_SINGLE 287
-#define MINUS 288
-#define SEMICOLON 289
-#define EQUAL 290
-#define PLUS 291
-#define MULT 292
-#define DIV 293
-#define NOT 294
-#define MOD 295
-#define XOR 296
-#define OR_SINGLE 297
+#define IF 260
+#define ELSE 261
+#define WHILE 262
+#define RETURN 263
+#define PRINT 264
+#define ADD_EQ 265
+#define SUB_EQ 266
+#define MULT_EQ 267
+#define DIV_EQ 268
+#define MOD_EQ 269
+#define MORE_EQ 270
+#define LESS_EQ 271
+#define NOT_EQUAL 272
+#define EQUAL_DOUBLE 273
+#define PUSHL_EQ 274
+#define PUSHR_EQ 275
+#define PUSHL 276
+#define PUSHR 277
+#define MORE 278
+#define LESS 279
+#define XOR_EQ 280
+#define OR_EQ 281
+#define AND_EQ 282
+#define AND 283
+#define OR 284
+#define AND_SINGLE 285
+#define MINUS 286
+#define SEMICOLON 287
+#define EQUAL 288
+#define PLUS 289
+#define MULT 290
+#define DIV 291
+#define NOT 292
+#define MOD 293
+#define XOR 294
+#define OR_SINGLE 295
+#define INC 296
+#define DEC 297
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 137 "parser.yacc"
+#line 196 "parser.yacc"
 
 	char * string;
 

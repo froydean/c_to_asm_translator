@@ -512,7 +512,7 @@ char *yytext;
 #line 2 "lexer.l"
 	#include <iostream>
 	#include "y.tab.h"
-	void yyerror(char *s);
+	void yyerror(std::string s);
 	
 	void unexpected_char_handler(char c)
 	{
@@ -842,12 +842,12 @@ return PRINT;
 case 6:
 YY_RULE_SETUP
 #line 33 "lexer.l"
-{yylval.string = strdup(yytext); return INC;}
+{/*yylval.string = strdup(yytext);*/ return INC;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 34 "lexer.l"
-{yylval.string = strdup(yytext); return DEC;}
+{/*yylval.string = strdup(yytext);*/ return DEC;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP

@@ -1,7 +1,7 @@
 %{
 	#include <iostream>
 	#include "y.tab.h"
-	void yyerror(char *s);
+	void yyerror(std::string s);
 	
 	void unexpected_char_handler(char c)
 	{
@@ -30,8 +30,8 @@ missed specific characters: <> [] # . ~ ~= comments &(other) *(other) , (other k
 "return"					return RETURN;
 "print"					return PRINT;
 
-"++" 						{yylval.string = strdup(yytext); return INC;}
-"--"						{yylval.string = strdup(yytext); return DEC;}
+"++" 						{/*yylval.string = strdup(yytext);*/ return INC;}
+"--"						{/*yylval.string = strdup(yytext);*/ return DEC;}
 
 "+="						return ADD_EQ;
 "-="						return SUB_EQ;
