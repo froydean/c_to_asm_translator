@@ -7,6 +7,8 @@
 	extern int yylineno;
 	extern int yylex();
 	bool num_error = 0;
+	
+	bool label_need = false;
 
 	//char * operato = {0x00};
 	std::string operato;
@@ -187,6 +189,28 @@
 		//cmp_op.clear();
 		
 		//label_counter
+		label_need = false;
+	}
+	
+	void print_and(){
+		std::cout<<"CMP [stack_top], 1"<< std::endl<< "JNE .L" << label_counter<<std::endl;
+		std::cout<<"POP"<<std::endl;
+		std::cout<<"CMP [stack_top], 1"<< std::endl<< "JNE .L" << label_counter++<<std::endl;
+		std::cout<<"POP"<<std::endl;
+	}
+	
+	void print_or(){
+		std::cout<<"CMP [stack_top], 1"<< std::endl<< "JE .L" << label_counter++<<std::endl;
+		std::cout<<"POP"<<std::endl;
+		std::cout<<"CMP [stack_top], 1"<< std::endl<< "JNE .L" << label_counter++<<std::endl;
+		std::cout<<"POP"<<std::endl;
+		label_need = true;
+	}
+	
+	void check_label(){
+		if (label_need){
+			std::cout <<" .L" << label_counter-2<<std::endl;
+		}
 	}
 
 
@@ -211,7 +235,7 @@
 
 /*
 Specific of this compilater:
-	IN THIS TRANSLATOR VERSION if(bool), () = expr, !expr, assignment - prohibited
+	IN THIS TRANSLATOR VERSION if(bool), () = expr, !expr, assignment - prohibited, ONLY WITH COMPARE
 	"a+b;" "a!=b;" etc. "a=b=c;" is not okay, only "VAR <some kind of  = > EXPR"
 	command also should be without bra
 	bool_condition do not support assignments as "(a=3)" "(b &= a)" "!a = 3" etc as right condition
@@ -226,17 +250,17 @@ Specific of this compilater:
 
 command:
 		assignment SEMICOLON {clear_all();}
-		| unary_opertr VAR SEMICOLON {std::cout << unary_operator << " " << $2 << std::endl; clear_all();}
-		| VAR unary_opertr SEMICOLON {std::cout << unary_operator << " " << $1 << std::endl;  clear_all();}
-		| print SEMICOLON {clear_all();}
-		| ret SEMICOLON {clear_all();}
-		| if{clear_all();}
-		| while{clear_all();}
+		| unary_opertr VAR SEMICOLON { check_label(); std::cout << unary_operator << " " << $2 << std::endl; clear_all();}
+		| VAR unary_opertr SEMICOLON { check_label(); std::cout << unary_operator << " " << $1 << std::endl;  clear_all();}
+		| print SEMICOLON {check_label(); clear_all();}
+		| ret SEMICOLON {check_label(); clear_all();}
+		| if{clear_all();} //check_label();
+		| while{clear_all();} //check_label();
 		| command command
 		;
 
 assignment:
-		VAR assign_operator expr {print_expr(); print_equal($1); printf("POP %s\n", $1);}
+		VAR assign_operator expr {check_label(); print_expr(); print_equal($1); printf("POP %s\n", $1);}
 		;
 
 expr: 
@@ -259,14 +283,11 @@ ret:
             ;
 
 //no need to be count operators after missing brackets bc it still right to syntax
-if:    
- IF '(' expr ')' { print_expr(); clear_all(); std::cout <<"PUSH 1" <<std::endl<<"JNE .L" << label_counter<<std::endl;}  command { std::cout << cmp_op_n << " .L" << label_counter++<<std::endl;}
-|IF '(' bool_condition ')' '{' command '}' 
+if:    IF '(' bool_condition ')' '{' command '}' 
             | IF '(' bool_condition ')' '{' command '}' ELSE '{' command '}'
             | IF '(' bool_condition ')' '{' command '}' ELSE command
             | IF '(' bool_condition ')' command ELSE '{' command '}'
             | IF '(' bool_condition ')'  command {std::cout <<" .L" << label_counter-1<<std::endl;}
-            
             | IF '(' bool_condition ')'  command ELSE command
             ;
 
@@ -274,16 +295,29 @@ while:
             WHILE '(' bool_condition ')' '{' command '}'
             | WHILE '('  bool_condition  ')' command
             ;
+            
+bool_help:
+	expr {print_expr(); clear_all();}
+	| NOT VAR {std::cout<<"PUSH !" << $2 <<std::endl;} // PUSH !VAR - pushes value of !VAR onto top of the stack
+	| NOT '(' expr ')' {print_expr(); clear_all(); std::cout<<"POP tmp" <<std::endl <<"PUSH !tmp" << std::endl;}
+	| VAR assign_operator expr {print_expr(); print_equal($1); printf("POP %s\nPUSH %s\n", $1, $1); clear_all();} //ass
+	| NOT '(' VAR assign_operator expr ')' {print_expr(); print_equal($3); printf("POP %s\nPUSH %s\n", $3, $3); clear_all(); std::cout<<"POP tmp" <<std::endl <<"PUSH !tmp" << std::endl;} //!ass
+	;
 
 bool_condition:
-		expr {print_expr(); clear_all();}
-		| NOT expr
-		| assignment {std::cout <<"PUSH 1" <<std::endl<<"JNE .L" << label_counter<<std::endl << cmp_op_n << " .L" << label_counter++<<std::endl;}
-		| NOT '(' assignment ')' 
-		//| expr comparison_operator expr { std::cout << cmp_op << " .L" << label_counter++<<std::endl;}
-		| bool_condition AND bool_condition 
-		| bool_condition OR bool_condition 
-		| bool_condition comparison_operator bool_condition { std::cout << cmp_op_n << " .L" << label_counter++<<std::endl;}
+		//expr {print_expr(); clear_all();}
+		//| NOT expr
+		//| assignment {std::cout <<"PUSH 1" <<std::endl<<"JNE .L" << label_counter<<std::endl << cmp_op_n << " .L" << label_counter++<<std::endl;}
+		//| NOT '(' assignment ')' 
+		| bool_help comparison_operator bool_help { std::cout << cmp_op_n << " .L" << label_counter++<<std::endl;}
+		| bool_help AND bool_help {print_and();}
+		| bool_help OR bool_help  {print_or();}
+		
+		
+		
+		| bool_condition AND bool_condition {printf("hi\n");}
+		| bool_condition OR bool_condition {printf("hi\n");}
+		//| bool_condition comparison_operator bool_condition { std::cout << cmp_op_n << " .L" << label_counter++<<std::endl;} 	prohibited
 		| '(' bool_condition ')' 
 		;
 
