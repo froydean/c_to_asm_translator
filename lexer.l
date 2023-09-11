@@ -23,7 +23,6 @@ missed specific characters: <> [] # . ~ ~= comments &(other) *(other) , (other k
 
 %%
 
-
 "if" 						return IF;
 "else" 					return ELSE;
 "while" 					return WHILE;

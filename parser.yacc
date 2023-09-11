@@ -12,6 +12,8 @@
 	std::string operato;
 	
 	std::string unary_operator;
+	std::string cmp_op;
+	std::string cmp_op_n;
 	
 	int label_counter = 0;
 
@@ -19,6 +21,7 @@
 
 	std::vector <std::string> express_ppn;
 	std::stack <std::string> stack_t;
+	
 	
 	void p(){
 		std::cout<<"ban"<<std::endl;
@@ -181,6 +184,7 @@
 		unary_operator.clear();
 		express.clear();
 		express_ppn.clear();
+		//cmp_op.clear();
 		
 		//label_counter
 	}
@@ -207,6 +211,7 @@
 
 /*
 Specific of this compilater:
+	IN THIS TRANSLATOR VERSION if(bool), () = expr, !expr, assignment - prohibited
 	"a+b;" "a!=b;" etc. "a=b=c;" is not okay, only "VAR <some kind of  = > EXPR"
 	command also should be without bra
 	bool_condition do not support assignments as "(a=3)" "(b &= a)" "!a = 3" etc as right condition
@@ -254,14 +259,15 @@ ret:
             ;
 
 //no need to be count operators after missing brackets bc it still right to syntax
-if:    IF '(' bool_condition ')' '{' command '}' 
+if:    
+ IF '(' expr ')' { print_expr(); clear_all(); std::cout <<"PUSH 1" <<std::endl<<"JNE .L" << label_counter<<std::endl;}  command { std::cout << cmp_op_n << " .L" << label_counter++<<std::endl;}
+|IF '(' bool_condition ')' '{' command '}' 
             | IF '(' bool_condition ')' '{' command '}' ELSE '{' command '}'
             | IF '(' bool_condition ')' '{' command '}' ELSE command
             | IF '(' bool_condition ')' command ELSE '{' command '}'
-            //| IF '(' bool_condition ')' '{' command '}' ELSE if
-            | IF '(' bool_condition ')'  command
+            | IF '(' bool_condition ')'  command {std::cout <<" .L" << label_counter-1<<std::endl;}
+            
             | IF '(' bool_condition ')'  command ELSE command
-            //| IF '(' bool_condition ')'  command ELSE if
             ;
 
 while: 
@@ -270,14 +276,14 @@ while:
             ;
 
 bool_condition:
-		expr
-		| NOT expr 
-		| assignment 
+		expr {print_expr(); clear_all();}
+		| NOT expr
+		| assignment {std::cout <<"PUSH 1" <<std::endl<<"JNE .L" << label_counter<<std::endl << cmp_op_n << " .L" << label_counter++<<std::endl;}
 		| NOT '(' assignment ')' 
-		| expr comparison_operator expr
+		//| expr comparison_operator expr { std::cout << cmp_op << " .L" << label_counter++<<std::endl;}
 		| bool_condition AND bool_condition 
 		| bool_condition OR bool_condition 
-		| bool_condition comparison_operator bool_condition 
+		| bool_condition comparison_operator bool_condition { std::cout << cmp_op_n << " .L" << label_counter++<<std::endl;}
 		| '(' bool_condition ')' 
 		;
 
@@ -298,12 +304,12 @@ assign_operator:
 
 comparison_operator:
 /*">="	"<="	"!="	"=="	">"	"<"*/
-			EQUAL_DOUBLE {express.push_back("JE");}
-			| NOT_EQUAL {express.push_back("JNE");}
-			| MORE_EQ {express.push_back("JGE");}
-			| LESS_EQ {express.push_back("JLE");}
-			| LESS {express.push_back("JL");}
-			| MORE {express.push_back("JG");}
+			EQUAL_DOUBLE {cmp_op = "JE"; cmp_op_n = "JNE";}
+			| NOT_EQUAL {cmp_op = "JNE"; cmp_op_n = "JE";}
+			| MORE_EQ {cmp_op = "JGE"; cmp_op_n = "JL";}
+			| LESS_EQ {cmp_op = "JLE"; cmp_op_n = "JG";}
+			| LESS {cmp_op = "JL"; cmp_op_n = "JCE";}
+			| MORE {cmp_op = "JG"; cmp_op_n = "JLE";}
 			;
 
 bin_opertr:
