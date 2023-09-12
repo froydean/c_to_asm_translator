@@ -277,7 +277,7 @@ Specific of this compilater:
 	command also should be without bra
 	bool_condition do not support assignments as "(a=3)" "(b &= a)" "!a = 3" etc as right condition
 	"!" without bracets relates to the first operand only (bool_condition)
-		p.s. may contain mistakes in this("!") moment
+		p.s. may contain mistakes in this("!") moment IN TRANSLATOR ONLY !VAR || !(EXPR)
 	"print" has madeup format
 	"return" can be without bra
 	reduce-reduce in da house
@@ -316,6 +316,8 @@ expr:
 	| VAR {ex_push_back($1);}
 	| NUMBER {ex_push_back($1);}
 	| '(' {express.push_back("(");} expr ')' {express.push_back(")");}
+	| NOT '(' expr ')' {print_expr(); clear_all(); std::cout << "NOT [stack_top]" << std::endl;} //NOT - ![stack_top] and pushes it back to top of the stack]
+	| NOT VAR {std::cout << "NOT " << $2 << std::endl;}
 	;
 
 print:
