@@ -33,6 +33,7 @@
 		std::cout<<"ban"<<std::endl;
 	}
 	
+	
 	void ex_push_back(char *s){
 		std::string tmp(s);
 		express.push_back(tmp);
@@ -62,12 +63,16 @@
 	
 	int prior(std::string op) {
 		if (op == "(") return 1;
-		if (op == "OR") return 2;
-		if (op == "XOR") return 3;
-		if (op == "AND") return 4;
-		if (op == "PUSHL" || op == "PUSHR") return 5;
-		if (op == "ADD" || op == "SUB") return 6;
-		if (op == "DIV" || op == "MULT" || op == "MOD") return 7;
+		if (op == "CMP_OR") return 2;
+		if (op == "CMP_AND") return 3;
+		if (op == "OR") return 4;
+		if (op == "XOR") return 5;
+		if (op == "AND") return 6;
+		if (op == "JE" || op == "JNE") return 7;
+		if (op == "JGE" || op == "JLE" || op == "JG" || op == "JL" ) return 8;
+		if (op == "PUSHL" || op == "PUSHR") return 9;
+		if (op == "ADD" || op == "SUB") return 10;
+		if (op == "DIV" || op == "MULT" || op == "MOD") return 11;
 		return 0;
 	}
 
@@ -75,11 +80,31 @@
 		if (cur == "ADD" || cur == "SUB" || cur == "DIV" || cur == "MULT") return true;
 		if (cur == "MOD" || cur == "AND" || cur == "XOR" || cur == "OR") return true;
 		if (cur == "PUSHL" || cur == "PUSHR") return true;
+		if (cur == "CMP_OR" || cur == "CMP_AND") return true;
+		if (cur == "JE" || cur == "JNE") return true;
+		if (cur == "JGE" || cur == "JLE" || cur == "JG" || cur == "JL" ) return true;
 		if (strncmp(cur.c_str(),"INC",3) == 0 || strncmp(cur.c_str(),"DEC",3) == 0) return true;
 		return false;
 	}
+	
+	 std::string opposite_un_oper(std::string cur){
+	 	//note
+	 	if (cur == "CMP_OR") return "CMP_OR";
+		if (cur == "CMP_AND") return "CMP_AND";
+		
+		if (cur == "JE") return "JNE";
+		if (cur == "JNE") return "JE";
+		if (cur == "JGE") return "JL";
+		if (cur == "JLE") return "JG";
+		if (cur == "JG") return "JLE";
+		if (cur == "JL") return "JGE";
+
+		return "none";
+	}
 
 	void convert_to_ppn() {
+	
+		//p();
 	
 		std::string tmp_postfix;
 
@@ -97,13 +122,13 @@
 					else{
 						std::string tmp = "DEC " + express[i+1];
 						express_ppn.push_back(tmp);
+						
 					}
 					continue;
 				}
 				else{
 					if (cur_s == "INC") {
 						tmp_postfix = "INC " + express[i-1];
-						//std::cout<< "debug :"<<tmp_postfix << std:: endl;
 						continue;
 					}
 					if (cur_s == "DEC") {
@@ -129,10 +154,12 @@
 					std::string tmp = stack_t.top();
 					stack_t.pop();
 					express_ppn.push_back(tmp);
+					
 					if (!stack_t.empty() && (strncmp(stack_t.top().c_str(),"INC",3) == 0 || strncmp(stack_t.top().c_str(),"INC",3) == 0)) {
 						tmp = stack_t.top();
 						stack_t.pop();
 						express_ppn.push_back(tmp);
+						
 					}	
 				}
 				if (stack_t.empty() || prior(cur_s) > prior(stack_t.top())) { //why only top
@@ -159,6 +186,7 @@
 			std::string tmp = stack_t.top();
 			stack_t.pop();
 			express_ppn.push_back(tmp);
+			
 		}
 	}
 
@@ -170,6 +198,30 @@
 		//print each element "ab+" as "push a push b add"
 		
 		for (auto i = express_ppn.begin(); i != express_ppn.end(); ++i) {
+			std::string tmp21 = opposite_un_oper(*i);
+			if (tmp21 != "none"){
+				if (tmp21 == "CMP_AND"){
+					std::cout<<"CMP [stack_top], 1"<< std::endl<< "JL .L" << label_counter<<std::endl << "POP"<<std::endl;
+					std::cout<<"CMP [stack_top], 1"<< std::endl<< "JL .L" << label_counter++<<std::endl <<"POP"<<std::endl;
+					std::cout << "PUSH 1" << std::endl <<"JMP .L" << label_counter << std::endl;
+					std::cout<<".L" <<label_counter-1<<std::endl << "PUSH 0" <<std::endl;
+					std::cout<<".L" <<label_counter++ <<std::endl;
+				}
+				else if (tmp21 == "CMP_OR"){
+					std::cout<<"CMP [stack_top], 1"<< std::endl<< "JGE .L" << label_counter++<<std::endl <<"POP"<<std::endl;
+					std::cout<<"CMP [stack_top], 1"<< std::endl<< "JL .L" << label_counter++<<std::endl <<"POP"<<std::endl;
+					std::cout<<".L" <<label_counter-2<<std::endl << "PUSH 1" <<std::endl <<"JMP .L" << label_counter << std::endl;
+					std::cout<<".L" <<label_counter-1 << std::endl << "PUSH 0" <<std::endl;
+					std::cout<<".L" <<label_counter++ << std::endl;
+				}
+				else{
+					std::cout<< tmp21 << " .L" <<label_counter++<<std::endl;
+					std::cout<<"PUSH 1"<<std::endl<<"JMP .L" <<label_counter++<<std::endl;
+					std::cout<<".L" <<label_counter-2<<std::endl << "PUSH 0" <<std::endl;
+					std::cout<<".L" <<label_counter-1 << std::endl;
+				}
+				continue;
+			}
 			if (is_operator(*i)){
 				std::cout<<*i<<std::endl;
 			}
@@ -187,33 +239,15 @@
 		express.clear();
 		express_ppn.clear();
 		//cmp_op.clear();
+		//cmp_op_n.clear();
 		
 		//label_counter
 		label_need = false;
 	}
 	
-	void print_and(){
-		std::cout<<"CMP [stack_top], 1"<< std::endl<< "JNE .L" << label_counter<<std::endl;
-		std::cout<<"POP"<<std::endl;
-		std::cout<<"CMP [stack_top], 1"<< std::endl<< "JNE .L" << label_counter++<<std::endl;
-		std::cout<<"POP"<<std::endl;
+	void print_lol(){
+		std::cout<<"CMP [stack_top], 1"<< std::endl<< "JL .L" << label_counter++ << std::endl;
 	}
-	
-	void print_or(){
-		std::cout<<"CMP [stack_top], 1"<< std::endl<< "JE .L" << label_counter++<<std::endl;
-		std::cout<<"POP"<<std::endl;
-		std::cout<<"CMP [stack_top], 1"<< std::endl<< "JNE .L" << label_counter++<<std::endl;
-		std::cout<<"POP"<<std::endl;
-		label_need = true;
-	}
-	
-	void check_label(){
-		if (label_need){
-			std::cout <<" .L" << label_counter-2<<std::endl;
-		}
-	}
-
-
 
 %}
 
@@ -225,13 +259,10 @@
 
 %destructor {free($$);} VAR
 %destructor {free($$);} NUMBER
-//%destructor {free($$);} INC
-//%destructor {free($$);} DEC
 
-%start command
+%start commands
 
-%token IF ELSE WHILE RETURN PRINT ADD_EQ SUB_EQ MULT_EQ DIV_EQ MOD_EQ MORE_EQ LESS_EQ NOT_EQUAL EQUAL_DOUBLE PUSHL_EQ PUSHR_EQ PUSHL PUSHR MORE LESS XOR_EQ OR_EQ AND_EQ AND OR AND_SINGLE MINUS SEMICOLON EQUAL PLUS MULT DIV NOT MOD XOR OR_SINGLE INC DEC //NUMBER VAR
-
+%token IF ELSE WHILE RETURN PRINT ADD_EQ SUB_EQ MULT_EQ DIV_EQ MOD_EQ MORE_EQ LESS_EQ NOT_EQUAL EQUAL_DOUBLE PUSHL_EQ PUSHR_EQ PUSHL PUSHR MORE LESS XOR_EQ OR_EQ AND_EQ AND OR AND_SINGLE MINUS SEMICOLON EQUAL PLUS MULT DIV NOT MOD XOR OR_SINGLE INC DEC
 
 /*
 Specific of this compilater:
@@ -248,23 +279,28 @@ Specific of this compilater:
 
 %%
 
+commands:
+	| commands command
+
 command:
 		assignment SEMICOLON {clear_all();}
-		| unary_opertr VAR SEMICOLON { check_label(); std::cout << unary_operator << " " << $2 << std::endl; clear_all();}
-		| VAR unary_opertr SEMICOLON { check_label(); std::cout << unary_operator << " " << $1 << std::endl;  clear_all();}
-		| print SEMICOLON {check_label(); clear_all();}
-		| ret SEMICOLON {check_label(); clear_all();}
-		| if{clear_all();} //check_label();
-		| while{clear_all();} //check_label();
-		| command command
+		| unary_opertr VAR SEMICOLON {std::cout << unary_operator << " " << $2 << std::endl; clear_all();}
+		| VAR unary_opertr SEMICOLON {std::cout << unary_operator << " " << $1 << std::endl;  clear_all();}
+		| print SEMICOLON {clear_all();}
+		| ret SEMICOLON {clear_all();}
+		| if {clear_all();}
+		| while {clear_all();}
+		//| command command
 		;
 
 assignment:
-		VAR assign_operator expr {check_label(); print_expr(); print_equal($1); printf("POP %s\n", $1);}
+		VAR assign_operator expr { print_expr(); print_equal($1); printf("POP %s\n", $1);}
 		;
-
+expr2:
+	expr {print_expr(); clear_all();}
 expr: 
-	expr bin_opertr expr 
+	expr bin_opertr expr
+	|expr comparison_operator expr
 	| INC VAR {express.push_back("INC"); express.push_back($2); }
 	| DEC VAR {express.push_back("DEC"); express.push_back($2); }
 	| VAR INC {express.push_back($1); express.push_back("INC"); }
@@ -281,45 +317,37 @@ ret:
             RETURN expr {print_expr(); printf("RET\n");} //RET - returns top of the stack
             |RETURN {printf("RET\n");}
             ;
-
+/*
 //no need to be count operators after missing brackets bc it still right to syntax
-if:    IF '(' bool_condition ')' '{' command '}' 
-            | IF '(' bool_condition ')' '{' command '}' ELSE '{' command '}'
-            | IF '(' bool_condition ')' '{' command '}' ELSE command
-            | IF '(' bool_condition ')' command ELSE '{' command '}'
-            | IF '(' bool_condition ')'  command {std::cout <<" .L" << label_counter-1<<std::endl;}
-            | IF '(' bool_condition ')'  command ELSE command
+if:    IF '(' expr ')' '{' command '}' 
+            | IF '(' expr ')' '{' command '}' ELSE '{' command '}'
+            | IF '(' expr ')' '{' command '}' ELSE command
+            | IF '(' expr ')' command ELSE '{' command '}'
+            | IF '(' expr ')'   command 
+            | IF '(' expr ')'  command ELSE command
             ;
 
 while: 
-            WHILE '(' bool_condition ')' '{' command '}'
-            | WHILE '('  bool_condition  ')' command
+            WHILE '(' expr ')' '{' command '}'
+            | WHILE '('  expr  ')' command
             ;
-            
-bool_help:
-	expr {print_expr(); clear_all();}
-	| NOT VAR {std::cout<<"PUSH !" << $2 <<std::endl;} // PUSH !VAR - pushes value of !VAR onto top of the stack
-	| NOT '(' expr ')' {print_expr(); clear_all(); std::cout<<"POP tmp" <<std::endl <<"PUSH !tmp" << std::endl;}
-	| VAR assign_operator expr {print_expr(); print_equal($1); printf("POP %s\nPUSH %s\n", $1, $1); clear_all();} //ass
-	| NOT '(' VAR assign_operator expr ')' {print_expr(); print_equal($3); printf("POP %s\nPUSH %s\n", $3, $3); clear_all(); std::cout<<"POP tmp" <<std::endl <<"PUSH !tmp" << std::endl;} //!ass
+*/
+
+body:
+	'{' commands '}'
+	| command 
 	;
 
-bool_condition:
-		//expr {print_expr(); clear_all();}
-		//| NOT expr
-		//| assignment {std::cout <<"PUSH 1" <<std::endl<<"JNE .L" << label_counter<<std::endl << cmp_op_n << " .L" << label_counter++<<std::endl;}
-		//| NOT '(' assignment ')' 
-		| bool_help comparison_operator bool_help { std::cout << cmp_op_n << " .L" << label_counter++<<std::endl;}
-		| bool_help AND bool_help {print_and();}
-		| bool_help OR bool_help  {print_or();}
-		
-		
-		
-		| bool_condition AND bool_condition {printf("hi\n");}
-		| bool_condition OR bool_condition {printf("hi\n");}
-		//| bool_condition comparison_operator bool_condition { std::cout << cmp_op_n << " .L" << label_counter++<<std::endl;} 	prohibited
-		| '(' bool_condition ')' 
-		;
+else: 
+	| ELSE body
+	
+if:
+	IF '(' expr2 ')' {print_lol();} body {std::cout << "JMP .L"<< label_counter<< std::endl << ".L" << label_counter-1 << std::endl;} else {std::cout << ".L" << label_counter++ << std::endl;}
+	;
+
+while:
+	WHILE {std::cout << ".L" << label_counter++ << std::endl;} '(' expr2 ')' {print_lol();} body {std::cout << "JMP .L" <<label_counter-4 << std::endl<<".L" << label_counter-1 << std::endl;}
+	;
 
 assign_operator:
 /*"="	"+="	"-="	"*="	"/="	"%="	"<<="	">>="	"^="	"|="	"&="*/
@@ -337,13 +365,15 @@ assign_operator:
 			;
 
 comparison_operator:
-/*">="	"<="	"!="	"=="	">"	"<"*/
-			EQUAL_DOUBLE {cmp_op = "JE"; cmp_op_n = "JNE";}
-			| NOT_EQUAL {cmp_op = "JNE"; cmp_op_n = "JE";}
-			| MORE_EQ {cmp_op = "JGE"; cmp_op_n = "JL";}
-			| LESS_EQ {cmp_op = "JLE"; cmp_op_n = "JG";}
-			| LESS {cmp_op = "JL"; cmp_op_n = "JCE";}
-			| MORE {cmp_op = "JG"; cmp_op_n = "JLE";}
+/*">="	"<="	"!="	"=="	">"	"<"*/ /*|| &&*/
+			EQUAL_DOUBLE {express.push_back("JE");}
+			| NOT_EQUAL {express.push_back("JNE");}
+			| MORE_EQ {express.push_back("JGE");}
+			| LESS_EQ {express.push_back("JLE");}
+			| LESS {express.push_back("JL");}
+			| MORE {express.push_back("JG");}
+			| AND {express.push_back("CMP_AND");}
+			| OR {express.push_back("CMP_OR");}
 			;
 
 bin_opertr:

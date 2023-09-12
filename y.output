@@ -1,1792 +1,1255 @@
-State 38 conflicts: 7 shift/reduce
-State 47 conflicts: 5 shift/reduce
-State 88 conflicts: 10 shift/reduce
-State 97 conflicts: 2 shift/reduce
-State 98 conflicts: 2 shift/reduce
-State 100 conflicts: 8 shift/reduce
-State 102 conflicts: 7 shift/reduce
-State 110 conflicts: 1 shift/reduce
-State 112 conflicts: 7 shift/reduce
-State 118 conflicts: 7 shift/reduce
+Terminals unused in grammar
+
+    NOT
+
+
+State 78 conflicts: 18 shift/reduce
+State 79 conflicts: 18 shift/reduce
+State 89 conflicts: 1 shift/reduce
 
 
 Grammar
 
-    0 $accept: command $end
+    0 $accept: commands $end
 
-    1 command: assignment SEMICOLON
-    2        | unary_opertr VAR SEMICOLON
-    3        | VAR unary_opertr SEMICOLON
-    4        | print SEMICOLON
-    5        | ret SEMICOLON
-    6        | if
-    7        | while
-    8        | command command
+    1 commands: %empty
+    2         | commands command
 
-    9 assignment: VAR assign_operator expr
+    3 command: assignment SEMICOLON
+    4        | unary_opertr VAR SEMICOLON
+    5        | VAR unary_opertr SEMICOLON
+    6        | print SEMICOLON
+    7        | ret SEMICOLON
+    8        | if
+    9        | while
 
-   10 expr: expr bin_opertr expr
-   11     | INC VAR
-   12     | DEC VAR
-   13     | VAR INC
-   14     | VAR DEC
-   15     | VAR
-   16     | NUMBER
+   10 assignment: VAR assign_operator expr
 
-   17 $@1: %empty
+   11 expr2: expr
 
-   18 expr: '(' $@1 expr ')'
+   12 expr: expr bin_opertr expr
+   13     | expr comparison_operator expr
+   14     | INC VAR
+   15     | DEC VAR
+   16     | VAR INC
+   17     | VAR DEC
+   18     | VAR
+   19     | NUMBER
 
-   19 print: PRINT '(' expr ')'
+   20 $@1: %empty
 
-   20 ret: RETURN expr
-   21    | RETURN
+   21 expr: '(' $@1 expr ')'
 
-   22 if: IF '(' bool_condition ')' '{' command '}'
-   23   | IF '(' bool_condition ')' '{' command '}' ELSE '{' command '}'
-   24   | IF '(' bool_condition ')' '{' command '}' ELSE command
-   25   | IF '(' bool_condition ')' command ELSE '{' command '}'
-   26   | IF '(' bool_condition ')' command
-   27   | IF '(' bool_condition ')' command ELSE command
+   22 print: PRINT '(' expr ')'
 
-   28 while: WHILE '(' bool_condition ')' '{' command '}'
-   29      | WHILE '(' bool_condition ')' command
+   23 ret: RETURN expr
+   24    | RETURN
 
-   30 bool_help: expr
-   31          | NOT VAR
-   32          | NOT '(' expr ')'
-   33          | VAR assign_operator expr
-   34          | NOT '(' VAR assign_operator expr ')'
+   25 body: '{' commands '}'
+   26     | command
 
-   35 bool_condition: %empty
-   36               | bool_help comparison_operator bool_help
-   37               | bool_help AND bool_help
-   38               | bool_help OR bool_help
-   39               | bool_condition AND bool_condition
-   40               | bool_condition OR bool_condition
-   41               | '(' bool_condition ')'
+   27 else: %empty
+   28     | ELSE body
 
-   42 assign_operator: EQUAL
-   43                | ADD_EQ
-   44                | SUB_EQ
-   45                | MULT_EQ
-   46                | DIV_EQ
-   47                | MOD_EQ
-   48                | PUSHL_EQ
-   49                | PUSHR_EQ
-   50                | XOR_EQ
-   51                | OR_EQ
-   52                | AND_EQ
+   29 $@2: %empty
 
-   53 comparison_operator: EQUAL_DOUBLE
-   54                    | NOT_EQUAL
-   55                    | MORE_EQ
-   56                    | LESS_EQ
-   57                    | LESS
-   58                    | MORE
+   30 $@3: %empty
 
-   59 bin_opertr: MINUS
-   60           | PLUS
-   61           | MULT
-   62           | DIV
-   63           | MOD
-   64           | XOR
-   65           | OR_SINGLE
-   66           | AND_SINGLE
-   67           | PUSHL
-   68           | PUSHR
+   31 if: IF '(' expr2 ')' $@2 body $@3 else
 
-   69 unary_opertr: INC
-   70             | DEC
+   32 $@4: %empty
+
+   33 $@5: %empty
+
+   34 while: WHILE $@4 '(' expr2 ')' $@5 body
+
+   35 assign_operator: EQUAL
+   36                | ADD_EQ
+   37                | SUB_EQ
+   38                | MULT_EQ
+   39                | DIV_EQ
+   40                | MOD_EQ
+   41                | PUSHL_EQ
+   42                | PUSHR_EQ
+   43                | XOR_EQ
+   44                | OR_EQ
+   45                | AND_EQ
+
+   46 comparison_operator: EQUAL_DOUBLE
+   47                    | NOT_EQUAL
+   48                    | MORE_EQ
+   49                    | LESS_EQ
+   50                    | LESS
+   51                    | MORE
+   52                    | AND
+   53                    | OR
+
+   54 bin_opertr: MINUS
+   55           | PLUS
+   56           | MULT
+   57           | DIV
+   58           | MOD
+   59           | XOR
+   60           | OR_SINGLE
+   61           | AND_SINGLE
+   62           | PUSHL
+   63           | PUSHR
+
+   64 unary_opertr: INC
+   65             | DEC
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    '(' (40) 18 19 22 23 24 25 26 27 28 29 32 34 41
-    ')' (41) 18 19 22 23 24 25 26 27 28 29 32 34 41
-    '{' (123) 22 23 24 25 28
-    '}' (125) 22 23 24 25 28
+    '(' (40) 21 22 31 34
+    ')' (41) 21 22 31 34
+    '{' (123) 25
+    '}' (125) 25
     error (256)
-    NUMBER <string> (258) 16
-    VAR <string> (259) 2 3 9 11 12 13 14 15 31 33 34
-    IF (260) 22 23 24 25 26 27
-    ELSE (261) 23 24 25 27
-    WHILE (262) 28 29
-    RETURN (263) 20 21
-    PRINT (264) 19
-    ADD_EQ (265) 43
-    SUB_EQ (266) 44
-    MULT_EQ (267) 45
-    DIV_EQ (268) 46
-    MOD_EQ (269) 47
-    MORE_EQ (270) 55
-    LESS_EQ (271) 56
-    NOT_EQUAL (272) 54
-    EQUAL_DOUBLE (273) 53
-    PUSHL_EQ (274) 48
-    PUSHR_EQ (275) 49
-    PUSHL (276) 67
-    PUSHR (277) 68
-    MORE (278) 58
-    LESS (279) 57
-    XOR_EQ (280) 50
-    OR_EQ (281) 51
-    AND_EQ (282) 52
-    AND (283) 37 39
-    OR (284) 38 40
-    AND_SINGLE (285) 66
-    MINUS (286) 59
-    SEMICOLON (287) 1 2 3 4 5
-    EQUAL (288) 42
-    PLUS (289) 60
-    MULT (290) 61
-    DIV (291) 62
-    NOT (292) 31 32 34
-    MOD (293) 63
-    XOR (294) 64
-    OR_SINGLE (295) 65
-    INC (296) 11 13 69
-    DEC (297) 12 14 70
+    NUMBER <string> (258) 19
+    VAR <string> (259) 4 5 10 14 15 16 17 18
+    IF (260) 31
+    ELSE (261) 28
+    WHILE (262) 34
+    RETURN (263) 23 24
+    PRINT (264) 22
+    ADD_EQ (265) 36
+    SUB_EQ (266) 37
+    MULT_EQ (267) 38
+    DIV_EQ (268) 39
+    MOD_EQ (269) 40
+    MORE_EQ (270) 48
+    LESS_EQ (271) 49
+    NOT_EQUAL (272) 47
+    EQUAL_DOUBLE (273) 46
+    PUSHL_EQ (274) 41
+    PUSHR_EQ (275) 42
+    PUSHL (276) 62
+    PUSHR (277) 63
+    MORE (278) 51
+    LESS (279) 50
+    XOR_EQ (280) 43
+    OR_EQ (281) 44
+    AND_EQ (282) 45
+    AND (283) 52
+    OR (284) 53
+    AND_SINGLE (285) 61
+    MINUS (286) 54
+    SEMICOLON (287) 3 4 5 6 7
+    EQUAL (288) 35
+    PLUS (289) 55
+    MULT (290) 56
+    DIV (291) 57
+    NOT (292)
+    MOD (293) 58
+    XOR (294) 59
+    OR_SINGLE (295) 60
+    INC (296) 14 16 64
+    DEC (297) 15 17 65
 
 
 Nonterminals, with rules where they appear
 
     $accept (47)
         on left: 0
-    command (48)
-        on left: 1 2 3 4 5 6 7 8
-        on right: 0 8 22 23 24 25 26 27 28 29
-    assignment (49)
-        on left: 9
-        on right: 1
-    expr (50)
-        on left: 10 11 12 13 14 15 16 18
-        on right: 9 10 18 19 20 30 32 33 34
-    $@1 (51)
-        on left: 17
-        on right: 18
-    print (52)
-        on left: 19
-        on right: 4
-    ret (53)
-        on left: 20 21
-        on right: 5
-    if (54)
-        on left: 22 23 24 25 26 27
+    commands (48)
+        on left: 1 2
+        on right: 0 2 25
+    command (49)
+        on left: 3 4 5 6 7 8 9
+        on right: 2 26
+    assignment (50)
+        on left: 10
+        on right: 3
+    expr2 (51)
+        on left: 11
+        on right: 31 34
+    expr (52)
+        on left: 12 13 14 15 16 17 18 19 21
+        on right: 10 11 12 13 21 22 23
+    $@1 (53)
+        on left: 20
+        on right: 21
+    print (54)
+        on left: 22
         on right: 6
-    while (55)
-        on left: 28 29
+    ret (55)
+        on left: 23 24
         on right: 7
-    bool_help (56)
-        on left: 30 31 32 33 34
-        on right: 36 37 38
-    bool_condition (57)
-        on left: 35 36 37 38 39 40 41
-        on right: 22 23 24 25 26 27 28 29 39 40 41
-    assign_operator (58)
-        on left: 42 43 44 45 46 47 48 49 50 51 52
-        on right: 9 33 34
-    comparison_operator (59)
-        on left: 53 54 55 56 57 58
-        on right: 36
-    bin_opertr (60)
-        on left: 59 60 61 62 63 64 65 66 67 68
+    body (56)
+        on left: 25 26
+        on right: 28 31 34
+    else (57)
+        on left: 27 28
+        on right: 31
+    if (58)
+        on left: 31
+        on right: 8
+    $@2 (59)
+        on left: 29
+        on right: 31
+    $@3 (60)
+        on left: 30
+        on right: 31
+    while (61)
+        on left: 34
+        on right: 9
+    $@4 (62)
+        on left: 32
+        on right: 34
+    $@5 (63)
+        on left: 33
+        on right: 34
+    assign_operator (64)
+        on left: 35 36 37 38 39 40 41 42 43 44 45
         on right: 10
-    unary_opertr (61)
-        on left: 69 70
-        on right: 2 3
+    comparison_operator (65)
+        on left: 46 47 48 49 50 51 52 53
+        on right: 13
+    bin_opertr (66)
+        on left: 54 55 56 57 58 59 60 61 62 63
+        on right: 12
+    unary_opertr (67)
+        on left: 64 65
+        on right: 4 5
 
 
 State 0
 
-    0 $accept: . command $end
+    0 $accept: . commands $end
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
+    $default  reduce using rule 1 (commands)
 
-    command       go to state 8
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
+    commands  go to state 1
 
 
 State 1
 
-    3 command: VAR . unary_opertr SEMICOLON
-    9 assignment: VAR . assign_operator expr
+    0 $accept: commands . $end
+    2 commands: commands . command
 
-    ADD_EQ    shift, and go to state 15
-    SUB_EQ    shift, and go to state 16
-    MULT_EQ   shift, and go to state 17
-    DIV_EQ    shift, and go to state 18
-    MOD_EQ    shift, and go to state 19
-    PUSHL_EQ  shift, and go to state 20
-    PUSHR_EQ  shift, and go to state 21
-    XOR_EQ    shift, and go to state 22
-    OR_EQ     shift, and go to state 23
-    AND_EQ    shift, and go to state 24
-    EQUAL     shift, and go to state 25
-    INC       shift, and go to state 6
-    DEC       shift, and go to state 7
+    $end    shift, and go to state 2
+    VAR     shift, and go to state 3
+    IF      shift, and go to state 4
+    WHILE   shift, and go to state 5
+    RETURN  shift, and go to state 6
+    PRINT   shift, and go to state 7
+    INC     shift, and go to state 8
+    DEC     shift, and go to state 9
 
-    assign_operator  go to state 26
-    unary_opertr     go to state 27
+    command       go to state 10
+    assignment    go to state 11
+    print         go to state 12
+    ret           go to state 13
+    if            go to state 14
+    while         go to state 15
+    unary_opertr  go to state 16
 
 
 State 2
 
-   22 if: IF . '(' bool_condition ')' '{' command '}'
-   23   | IF . '(' bool_condition ')' '{' command '}' ELSE '{' command '}'
-   24   | IF . '(' bool_condition ')' '{' command '}' ELSE command
-   25   | IF . '(' bool_condition ')' command ELSE '{' command '}'
-   26   | IF . '(' bool_condition ')' command
-   27   | IF . '(' bool_condition ')' command ELSE command
-
-    '('  shift, and go to state 28
-
-
-State 3
-
-   28 while: WHILE . '(' bool_condition ')' '{' command '}'
-   29      | WHILE . '(' bool_condition ')' command
-
-    '('  shift, and go to state 29
-
-
-State 4
-
-   20 ret: RETURN . expr
-   21    | RETURN .
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 31
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 34
-
-    $default  reduce using rule 21 (ret)
-
-    expr  go to state 35
-
-
-State 5
-
-   19 print: PRINT . '(' expr ')'
-
-    '('  shift, and go to state 36
-
-
-State 6
-
-   69 unary_opertr: INC .
-
-    $default  reduce using rule 69 (unary_opertr)
-
-
-State 7
-
-   70 unary_opertr: DEC .
-
-    $default  reduce using rule 70 (unary_opertr)
-
-
-State 8
-
-    0 $accept: command . $end
-    8 command: command . command
-
-    $end    shift, and go to state 37
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-
-    command       go to state 38
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
-
-
-State 9
-
-    1 command: assignment . SEMICOLON
-
-    SEMICOLON  shift, and go to state 39
-
-
-State 10
-
-    4 command: print . SEMICOLON
-
-    SEMICOLON  shift, and go to state 40
-
-
-State 11
-
-    5 command: ret . SEMICOLON
-
-    SEMICOLON  shift, and go to state 41
-
-
-State 12
-
-    6 command: if .
-
-    $default  reduce using rule 6 (command)
-
-
-State 13
-
-    7 command: while .
-
-    $default  reduce using rule 7 (command)
-
-
-State 14
-
-    2 command: unary_opertr . VAR SEMICOLON
-
-    VAR  shift, and go to state 42
-
-
-State 15
-
-   43 assign_operator: ADD_EQ .
-
-    $default  reduce using rule 43 (assign_operator)
-
-
-State 16
-
-   44 assign_operator: SUB_EQ .
-
-    $default  reduce using rule 44 (assign_operator)
-
-
-State 17
-
-   45 assign_operator: MULT_EQ .
-
-    $default  reduce using rule 45 (assign_operator)
-
-
-State 18
-
-   46 assign_operator: DIV_EQ .
-
-    $default  reduce using rule 46 (assign_operator)
-
-
-State 19
-
-   47 assign_operator: MOD_EQ .
-
-    $default  reduce using rule 47 (assign_operator)
-
-
-State 20
-
-   48 assign_operator: PUSHL_EQ .
-
-    $default  reduce using rule 48 (assign_operator)
-
-
-State 21
-
-   49 assign_operator: PUSHR_EQ .
-
-    $default  reduce using rule 49 (assign_operator)
-
-
-State 22
-
-   50 assign_operator: XOR_EQ .
-
-    $default  reduce using rule 50 (assign_operator)
-
-
-State 23
-
-   51 assign_operator: OR_EQ .
-
-    $default  reduce using rule 51 (assign_operator)
-
-
-State 24
-
-   52 assign_operator: AND_EQ .
-
-    $default  reduce using rule 52 (assign_operator)
-
-
-State 25
-
-   42 assign_operator: EQUAL .
-
-    $default  reduce using rule 42 (assign_operator)
-
-
-State 26
-
-    9 assignment: VAR assign_operator . expr
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 31
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 34
-
-    expr  go to state 43
-
-
-State 27
-
-    3 command: VAR unary_opertr . SEMICOLON
-
-    SEMICOLON  shift, and go to state 44
-
-
-State 28
-
-   22 if: IF '(' . bool_condition ')' '{' command '}'
-   23   | IF '(' . bool_condition ')' '{' command '}' ELSE '{' command '}'
-   24   | IF '(' . bool_condition ')' '{' command '}' ELSE command
-   25   | IF '(' . bool_condition ')' command ELSE '{' command '}'
-   26   | IF '(' . bool_condition ')' command
-   27   | IF '(' . bool_condition ')' command ELSE command
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 45
-    NOT     shift, and go to state 46
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 47
-
-    $default  reduce using rule 35 (bool_condition)
-
-    expr            go to state 48
-    bool_help       go to state 49
-    bool_condition  go to state 50
-
-
-State 29
-
-   28 while: WHILE '(' . bool_condition ')' '{' command '}'
-   29      | WHILE '(' . bool_condition ')' command
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 45
-    NOT     shift, and go to state 46
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 47
-
-    $default  reduce using rule 35 (bool_condition)
-
-    expr            go to state 48
-    bool_help       go to state 49
-    bool_condition  go to state 51
-
-
-State 30
-
-   16 expr: NUMBER .
-
-    $default  reduce using rule 16 (expr)
-
-
-State 31
-
-   13 expr: VAR . INC
-   14     | VAR . DEC
-   15     | VAR .
-
-    INC  shift, and go to state 52
-    DEC  shift, and go to state 53
-
-    $default  reduce using rule 15 (expr)
-
-
-State 32
-
-   11 expr: INC . VAR
-
-    VAR  shift, and go to state 54
-
-
-State 33
-
-   12 expr: DEC . VAR
-
-    VAR  shift, and go to state 55
-
-
-State 34
-
-   18 expr: '(' . $@1 expr ')'
-
-    $default  reduce using rule 17 ($@1)
-
-    $@1  go to state 56
-
-
-State 35
-
-   10 expr: expr . bin_opertr expr
-   20 ret: RETURN expr .
-
-    PUSHL       shift, and go to state 57
-    PUSHR       shift, and go to state 58
-    AND_SINGLE  shift, and go to state 59
-    MINUS       shift, and go to state 60
-    PLUS        shift, and go to state 61
-    MULT        shift, and go to state 62
-    DIV         shift, and go to state 63
-    MOD         shift, and go to state 64
-    XOR         shift, and go to state 65
-    OR_SINGLE   shift, and go to state 66
-
-    $default  reduce using rule 20 (ret)
-
-    bin_opertr  go to state 67
-
-
-State 36
-
-   19 print: PRINT '(' . expr ')'
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 31
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 34
-
-    expr  go to state 68
-
-
-State 37
-
-    0 $accept: command $end .
+    0 $accept: commands $end .
 
     $default  accept
 
 
-State 38
+State 3
 
-    8 command: command . command
-    8        | command command .
+    5 command: VAR . unary_opertr SEMICOLON
+   10 assignment: VAR . assign_operator expr
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
+    ADD_EQ    shift, and go to state 17
+    SUB_EQ    shift, and go to state 18
+    MULT_EQ   shift, and go to state 19
+    DIV_EQ    shift, and go to state 20
+    MOD_EQ    shift, and go to state 21
+    PUSHL_EQ  shift, and go to state 22
+    PUSHR_EQ  shift, and go to state 23
+    XOR_EQ    shift, and go to state 24
+    OR_EQ     shift, and go to state 25
+    AND_EQ    shift, and go to state 26
+    EQUAL     shift, and go to state 27
+    INC       shift, and go to state 8
+    DEC       shift, and go to state 9
 
-    VAR       [reduce using rule 8 (command)]
-    IF        [reduce using rule 8 (command)]
-    WHILE     [reduce using rule 8 (command)]
-    RETURN    [reduce using rule 8 (command)]
-    PRINT     [reduce using rule 8 (command)]
-    INC       [reduce using rule 8 (command)]
-    DEC       [reduce using rule 8 (command)]
+    assign_operator  go to state 28
+    unary_opertr     go to state 29
+
+
+State 4
+
+   31 if: IF . '(' expr2 ')' $@2 body $@3 else
+
+    '('  shift, and go to state 30
+
+
+State 5
+
+   34 while: WHILE . $@4 '(' expr2 ')' $@5 body
+
+    $default  reduce using rule 32 ($@4)
+
+    $@4  go to state 31
+
+
+State 6
+
+   23 ret: RETURN . expr
+   24    | RETURN .
+
+    NUMBER  shift, and go to state 32
+    VAR     shift, and go to state 33
+    INC     shift, and go to state 34
+    DEC     shift, and go to state 35
+    '('     shift, and go to state 36
+
+    $default  reduce using rule 24 (ret)
+
+    expr  go to state 37
+
+
+State 7
+
+   22 print: PRINT . '(' expr ')'
+
+    '('  shift, and go to state 38
+
+
+State 8
+
+   64 unary_opertr: INC .
+
+    $default  reduce using rule 64 (unary_opertr)
+
+
+State 9
+
+   65 unary_opertr: DEC .
+
+    $default  reduce using rule 65 (unary_opertr)
+
+
+State 10
+
+    2 commands: commands command .
+
+    $default  reduce using rule 2 (commands)
+
+
+State 11
+
+    3 command: assignment . SEMICOLON
+
+    SEMICOLON  shift, and go to state 39
+
+
+State 12
+
+    6 command: print . SEMICOLON
+
+    SEMICOLON  shift, and go to state 40
+
+
+State 13
+
+    7 command: ret . SEMICOLON
+
+    SEMICOLON  shift, and go to state 41
+
+
+State 14
+
+    8 command: if .
+
     $default  reduce using rule 8 (command)
 
-    command       go to state 38
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
 
+State 15
 
-State 39
+    9 command: while .
 
-    1 command: assignment SEMICOLON .
+    $default  reduce using rule 9 (command)
 
-    $default  reduce using rule 1 (command)
 
+State 16
 
-State 40
+    4 command: unary_opertr . VAR SEMICOLON
 
-    4 command: print SEMICOLON .
+    VAR  shift, and go to state 42
 
-    $default  reduce using rule 4 (command)
 
+State 17
 
-State 41
+   36 assign_operator: ADD_EQ .
 
-    5 command: ret SEMICOLON .
+    $default  reduce using rule 36 (assign_operator)
 
-    $default  reduce using rule 5 (command)
 
+State 18
 
-State 42
+   37 assign_operator: SUB_EQ .
 
-    2 command: unary_opertr VAR . SEMICOLON
+    $default  reduce using rule 37 (assign_operator)
 
-    SEMICOLON  shift, and go to state 69
 
+State 19
 
-State 43
+   38 assign_operator: MULT_EQ .
 
-    9 assignment: VAR assign_operator expr .
-   10 expr: expr . bin_opertr expr
+    $default  reduce using rule 38 (assign_operator)
 
-    PUSHL       shift, and go to state 57
-    PUSHR       shift, and go to state 58
-    AND_SINGLE  shift, and go to state 59
-    MINUS       shift, and go to state 60
-    PLUS        shift, and go to state 61
-    MULT        shift, and go to state 62
-    DIV         shift, and go to state 63
-    MOD         shift, and go to state 64
-    XOR         shift, and go to state 65
-    OR_SINGLE   shift, and go to state 66
 
-    $default  reduce using rule 9 (assignment)
+State 20
 
-    bin_opertr  go to state 67
+   39 assign_operator: DIV_EQ .
 
+    $default  reduce using rule 39 (assign_operator)
 
-State 44
 
-    3 command: VAR unary_opertr SEMICOLON .
+State 21
 
-    $default  reduce using rule 3 (command)
+   40 assign_operator: MOD_EQ .
 
+    $default  reduce using rule 40 (assign_operator)
 
-State 45
 
-   13 expr: VAR . INC
-   14     | VAR . DEC
-   15     | VAR .
-   33 bool_help: VAR . assign_operator expr
+State 22
 
-    ADD_EQ    shift, and go to state 15
-    SUB_EQ    shift, and go to state 16
-    MULT_EQ   shift, and go to state 17
-    DIV_EQ    shift, and go to state 18
-    MOD_EQ    shift, and go to state 19
-    PUSHL_EQ  shift, and go to state 20
-    PUSHR_EQ  shift, and go to state 21
-    XOR_EQ    shift, and go to state 22
-    OR_EQ     shift, and go to state 23
-    AND_EQ    shift, and go to state 24
-    EQUAL     shift, and go to state 25
-    INC       shift, and go to state 52
-    DEC       shift, and go to state 53
+   41 assign_operator: PUSHL_EQ .
 
-    $default  reduce using rule 15 (expr)
+    $default  reduce using rule 41 (assign_operator)
 
-    assign_operator  go to state 70
 
+State 23
 
-State 46
+   42 assign_operator: PUSHR_EQ .
 
-   31 bool_help: NOT . VAR
-   32          | NOT . '(' expr ')'
-   34          | NOT . '(' VAR assign_operator expr ')'
+    $default  reduce using rule 42 (assign_operator)
 
-    VAR  shift, and go to state 71
-    '('  shift, and go to state 72
 
+State 24
 
-State 47
+   43 assign_operator: XOR_EQ .
 
-   18 expr: '(' . $@1 expr ')'
-   41 bool_condition: '(' . bool_condition ')'
+    $default  reduce using rule 43 (assign_operator)
 
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 45
-    NOT     shift, and go to state 46
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 47
 
-    NUMBER    [reduce using rule 17 ($@1)]
-    VAR       [reduce using rule 17 ($@1)]
-    INC       [reduce using rule 17 ($@1)]
-    DEC       [reduce using rule 17 ($@1)]
-    '('       [reduce using rule 17 ($@1)]
-    $default  reduce using rule 35 (bool_condition)
+State 25
 
-    expr            go to state 48
-    $@1             go to state 56
-    bool_help       go to state 49
-    bool_condition  go to state 73
+   44 assign_operator: OR_EQ .
 
+    $default  reduce using rule 44 (assign_operator)
 
-State 48
 
-   10 expr: expr . bin_opertr expr
-   30 bool_help: expr .
+State 26
 
-    PUSHL       shift, and go to state 57
-    PUSHR       shift, and go to state 58
-    AND_SINGLE  shift, and go to state 59
-    MINUS       shift, and go to state 60
-    PLUS        shift, and go to state 61
-    MULT        shift, and go to state 62
-    DIV         shift, and go to state 63
-    MOD         shift, and go to state 64
-    XOR         shift, and go to state 65
-    OR_SINGLE   shift, and go to state 66
+   45 assign_operator: AND_EQ .
 
-    $default  reduce using rule 30 (bool_help)
+    $default  reduce using rule 45 (assign_operator)
 
-    bin_opertr  go to state 67
 
+State 27
 
-State 49
+   35 assign_operator: EQUAL .
 
-   36 bool_condition: bool_help . comparison_operator bool_help
-   37               | bool_help . AND bool_help
-   38               | bool_help . OR bool_help
+    $default  reduce using rule 35 (assign_operator)
 
-    MORE_EQ       shift, and go to state 74
-    LESS_EQ       shift, and go to state 75
-    NOT_EQUAL     shift, and go to state 76
-    EQUAL_DOUBLE  shift, and go to state 77
-    MORE          shift, and go to state 78
-    LESS          shift, and go to state 79
-    AND           shift, and go to state 80
-    OR            shift, and go to state 81
 
-    comparison_operator  go to state 82
+State 28
 
+   10 assignment: VAR assign_operator . expr
 
-State 50
+    NUMBER  shift, and go to state 32
+    VAR     shift, and go to state 33
+    INC     shift, and go to state 34
+    DEC     shift, and go to state 35
+    '('     shift, and go to state 36
 
-   22 if: IF '(' bool_condition . ')' '{' command '}'
-   23   | IF '(' bool_condition . ')' '{' command '}' ELSE '{' command '}'
-   24   | IF '(' bool_condition . ')' '{' command '}' ELSE command
-   25   | IF '(' bool_condition . ')' command ELSE '{' command '}'
-   26   | IF '(' bool_condition . ')' command
-   27   | IF '(' bool_condition . ')' command ELSE command
-   39 bool_condition: bool_condition . AND bool_condition
-   40               | bool_condition . OR bool_condition
+    expr  go to state 43
 
-    AND  shift, and go to state 83
-    OR   shift, and go to state 84
-    ')'  shift, and go to state 85
 
+State 29
 
-State 51
+    5 command: VAR unary_opertr . SEMICOLON
 
-   28 while: WHILE '(' bool_condition . ')' '{' command '}'
-   29      | WHILE '(' bool_condition . ')' command
-   39 bool_condition: bool_condition . AND bool_condition
-   40               | bool_condition . OR bool_condition
+    SEMICOLON  shift, and go to state 44
 
-    AND  shift, and go to state 83
-    OR   shift, and go to state 84
-    ')'  shift, and go to state 86
 
+State 30
 
-State 52
+   31 if: IF '(' . expr2 ')' $@2 body $@3 else
 
-   13 expr: VAR INC .
+    NUMBER  shift, and go to state 32
+    VAR     shift, and go to state 33
+    INC     shift, and go to state 34
+    DEC     shift, and go to state 35
+    '('     shift, and go to state 36
 
-    $default  reduce using rule 13 (expr)
+    expr2  go to state 45
+    expr   go to state 46
 
 
-State 53
+State 31
 
-   14 expr: VAR DEC .
+   34 while: WHILE $@4 . '(' expr2 ')' $@5 body
 
-    $default  reduce using rule 14 (expr)
+    '('  shift, and go to state 47
 
 
-State 54
+State 32
 
-   11 expr: INC VAR .
+   19 expr: NUMBER .
 
-    $default  reduce using rule 11 (expr)
+    $default  reduce using rule 19 (expr)
 
 
-State 55
+State 33
 
-   12 expr: DEC VAR .
+   16 expr: VAR . INC
+   17     | VAR . DEC
+   18     | VAR .
 
-    $default  reduce using rule 12 (expr)
-
-
-State 56
-
-   18 expr: '(' $@1 . expr ')'
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 31
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 34
-
-    expr  go to state 87
-
-
-State 57
-
-   67 bin_opertr: PUSHL .
-
-    $default  reduce using rule 67 (bin_opertr)
-
-
-State 58
-
-   68 bin_opertr: PUSHR .
-
-    $default  reduce using rule 68 (bin_opertr)
-
-
-State 59
-
-   66 bin_opertr: AND_SINGLE .
-
-    $default  reduce using rule 66 (bin_opertr)
-
-
-State 60
-
-   59 bin_opertr: MINUS .
-
-    $default  reduce using rule 59 (bin_opertr)
-
-
-State 61
-
-   60 bin_opertr: PLUS .
-
-    $default  reduce using rule 60 (bin_opertr)
-
-
-State 62
-
-   61 bin_opertr: MULT .
-
-    $default  reduce using rule 61 (bin_opertr)
-
-
-State 63
-
-   62 bin_opertr: DIV .
-
-    $default  reduce using rule 62 (bin_opertr)
-
-
-State 64
-
-   63 bin_opertr: MOD .
-
-    $default  reduce using rule 63 (bin_opertr)
-
-
-State 65
-
-   64 bin_opertr: XOR .
-
-    $default  reduce using rule 64 (bin_opertr)
-
-
-State 66
-
-   65 bin_opertr: OR_SINGLE .
-
-    $default  reduce using rule 65 (bin_opertr)
-
-
-State 67
-
-   10 expr: expr bin_opertr . expr
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 31
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 34
-
-    expr  go to state 88
-
-
-State 68
-
-   10 expr: expr . bin_opertr expr
-   19 print: PRINT '(' expr . ')'
-
-    PUSHL       shift, and go to state 57
-    PUSHR       shift, and go to state 58
-    AND_SINGLE  shift, and go to state 59
-    MINUS       shift, and go to state 60
-    PLUS        shift, and go to state 61
-    MULT        shift, and go to state 62
-    DIV         shift, and go to state 63
-    MOD         shift, and go to state 64
-    XOR         shift, and go to state 65
-    OR_SINGLE   shift, and go to state 66
-    ')'         shift, and go to state 89
-
-    bin_opertr  go to state 67
-
-
-State 69
-
-    2 command: unary_opertr VAR SEMICOLON .
-
-    $default  reduce using rule 2 (command)
-
-
-State 70
-
-   33 bool_help: VAR assign_operator . expr
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 31
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 34
-
-    expr  go to state 90
-
-
-State 71
-
-   31 bool_help: NOT VAR .
-
-    $default  reduce using rule 31 (bool_help)
-
-
-State 72
-
-   32 bool_help: NOT '(' . expr ')'
-   34          | NOT '(' . VAR assign_operator expr ')'
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 91
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 34
-
-    expr  go to state 92
-
-
-State 73
-
-   39 bool_condition: bool_condition . AND bool_condition
-   40               | bool_condition . OR bool_condition
-   41               | '(' bool_condition . ')'
-
-    AND  shift, and go to state 83
-    OR   shift, and go to state 84
-    ')'  shift, and go to state 93
-
-
-State 74
-
-   55 comparison_operator: MORE_EQ .
-
-    $default  reduce using rule 55 (comparison_operator)
-
-
-State 75
-
-   56 comparison_operator: LESS_EQ .
-
-    $default  reduce using rule 56 (comparison_operator)
-
-
-State 76
-
-   54 comparison_operator: NOT_EQUAL .
-
-    $default  reduce using rule 54 (comparison_operator)
-
-
-State 77
-
-   53 comparison_operator: EQUAL_DOUBLE .
-
-    $default  reduce using rule 53 (comparison_operator)
-
-
-State 78
-
-   58 comparison_operator: MORE .
-
-    $default  reduce using rule 58 (comparison_operator)
-
-
-State 79
-
-   57 comparison_operator: LESS .
-
-    $default  reduce using rule 57 (comparison_operator)
-
-
-State 80
-
-   37 bool_condition: bool_help AND . bool_help
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 45
-    NOT     shift, and go to state 46
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 34
-
-    expr       go to state 48
-    bool_help  go to state 94
-
-
-State 81
-
-   38 bool_condition: bool_help OR . bool_help
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 45
-    NOT     shift, and go to state 46
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 34
-
-    expr       go to state 48
-    bool_help  go to state 95
-
-
-State 82
-
-   36 bool_condition: bool_help comparison_operator . bool_help
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 45
-    NOT     shift, and go to state 46
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 34
-
-    expr       go to state 48
-    bool_help  go to state 96
-
-
-State 83
-
-   39 bool_condition: bool_condition AND . bool_condition
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 45
-    NOT     shift, and go to state 46
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 47
-
-    $default  reduce using rule 35 (bool_condition)
-
-    expr            go to state 48
-    bool_help       go to state 49
-    bool_condition  go to state 97
-
-
-State 84
-
-   40 bool_condition: bool_condition OR . bool_condition
-
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 45
-    NOT     shift, and go to state 46
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 47
-
-    $default  reduce using rule 35 (bool_condition)
-
-    expr            go to state 48
-    bool_help       go to state 49
-    bool_condition  go to state 98
-
-
-State 85
-
-   22 if: IF '(' bool_condition ')' . '{' command '}'
-   23   | IF '(' bool_condition ')' . '{' command '}' ELSE '{' command '}'
-   24   | IF '(' bool_condition ')' . '{' command '}' ELSE command
-   25   | IF '(' bool_condition ')' . command ELSE '{' command '}'
-   26   | IF '(' bool_condition ')' . command
-   27   | IF '(' bool_condition ')' . command ELSE command
-
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-    '{'     shift, and go to state 99
-
-    command       go to state 100
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
-
-
-State 86
-
-   28 while: WHILE '(' bool_condition ')' . '{' command '}'
-   29      | WHILE '(' bool_condition ')' . command
-
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-    '{'     shift, and go to state 101
-
-    command       go to state 102
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
-
-
-State 87
-
-   10 expr: expr . bin_opertr expr
-   18     | '(' $@1 expr . ')'
-
-    PUSHL       shift, and go to state 57
-    PUSHR       shift, and go to state 58
-    AND_SINGLE  shift, and go to state 59
-    MINUS       shift, and go to state 60
-    PLUS        shift, and go to state 61
-    MULT        shift, and go to state 62
-    DIV         shift, and go to state 63
-    MOD         shift, and go to state 64
-    XOR         shift, and go to state 65
-    OR_SINGLE   shift, and go to state 66
-    ')'         shift, and go to state 103
-
-    bin_opertr  go to state 67
-
-
-State 88
-
-   10 expr: expr . bin_opertr expr
-   10     | expr bin_opertr expr .
-
-    PUSHL       shift, and go to state 57
-    PUSHR       shift, and go to state 58
-    AND_SINGLE  shift, and go to state 59
-    MINUS       shift, and go to state 60
-    PLUS        shift, and go to state 61
-    MULT        shift, and go to state 62
-    DIV         shift, and go to state 63
-    MOD         shift, and go to state 64
-    XOR         shift, and go to state 65
-    OR_SINGLE   shift, and go to state 66
-
-    PUSHL       [reduce using rule 10 (expr)]
-    PUSHR       [reduce using rule 10 (expr)]
-    AND_SINGLE  [reduce using rule 10 (expr)]
-    MINUS       [reduce using rule 10 (expr)]
-    PLUS        [reduce using rule 10 (expr)]
-    MULT        [reduce using rule 10 (expr)]
-    DIV         [reduce using rule 10 (expr)]
-    MOD         [reduce using rule 10 (expr)]
-    XOR         [reduce using rule 10 (expr)]
-    OR_SINGLE   [reduce using rule 10 (expr)]
-    $default    reduce using rule 10 (expr)
-
-    bin_opertr  go to state 67
-
-
-State 89
-
-   19 print: PRINT '(' expr ')' .
-
-    $default  reduce using rule 19 (print)
-
-
-State 90
-
-   10 expr: expr . bin_opertr expr
-   33 bool_help: VAR assign_operator expr .
-
-    PUSHL       shift, and go to state 57
-    PUSHR       shift, and go to state 58
-    AND_SINGLE  shift, and go to state 59
-    MINUS       shift, and go to state 60
-    PLUS        shift, and go to state 61
-    MULT        shift, and go to state 62
-    DIV         shift, and go to state 63
-    MOD         shift, and go to state 64
-    XOR         shift, and go to state 65
-    OR_SINGLE   shift, and go to state 66
-
-    $default  reduce using rule 33 (bool_help)
-
-    bin_opertr  go to state 67
-
-
-State 91
-
-   13 expr: VAR . INC
-   14     | VAR . DEC
-   15     | VAR .
-   34 bool_help: NOT '(' VAR . assign_operator expr ')'
-
-    ADD_EQ    shift, and go to state 15
-    SUB_EQ    shift, and go to state 16
-    MULT_EQ   shift, and go to state 17
-    DIV_EQ    shift, and go to state 18
-    MOD_EQ    shift, and go to state 19
-    PUSHL_EQ  shift, and go to state 20
-    PUSHR_EQ  shift, and go to state 21
-    XOR_EQ    shift, and go to state 22
-    OR_EQ     shift, and go to state 23
-    AND_EQ    shift, and go to state 24
-    EQUAL     shift, and go to state 25
-    INC       shift, and go to state 52
-    DEC       shift, and go to state 53
-
-    $default  reduce using rule 15 (expr)
-
-    assign_operator  go to state 104
-
-
-State 92
-
-   10 expr: expr . bin_opertr expr
-   32 bool_help: NOT '(' expr . ')'
-
-    PUSHL       shift, and go to state 57
-    PUSHR       shift, and go to state 58
-    AND_SINGLE  shift, and go to state 59
-    MINUS       shift, and go to state 60
-    PLUS        shift, and go to state 61
-    MULT        shift, and go to state 62
-    DIV         shift, and go to state 63
-    MOD         shift, and go to state 64
-    XOR         shift, and go to state 65
-    OR_SINGLE   shift, and go to state 66
-    ')'         shift, and go to state 105
-
-    bin_opertr  go to state 67
-
-
-State 93
-
-   41 bool_condition: '(' bool_condition ')' .
-
-    $default  reduce using rule 41 (bool_condition)
-
-
-State 94
-
-   37 bool_condition: bool_help AND bool_help .
-
-    $default  reduce using rule 37 (bool_condition)
-
-
-State 95
-
-   38 bool_condition: bool_help OR bool_help .
-
-    $default  reduce using rule 38 (bool_condition)
-
-
-State 96
-
-   36 bool_condition: bool_help comparison_operator bool_help .
-
-    $default  reduce using rule 36 (bool_condition)
-
-
-State 97
-
-   39 bool_condition: bool_condition . AND bool_condition
-   39               | bool_condition AND bool_condition .
-   40               | bool_condition . OR bool_condition
-
-    AND  shift, and go to state 83
-    OR   shift, and go to state 84
-
-    AND       [reduce using rule 39 (bool_condition)]
-    OR        [reduce using rule 39 (bool_condition)]
-    $default  reduce using rule 39 (bool_condition)
-
-
-State 98
-
-   39 bool_condition: bool_condition . AND bool_condition
-   40               | bool_condition . OR bool_condition
-   40               | bool_condition OR bool_condition .
-
-    AND  shift, and go to state 83
-    OR   shift, and go to state 84
-
-    AND       [reduce using rule 40 (bool_condition)]
-    OR        [reduce using rule 40 (bool_condition)]
-    $default  reduce using rule 40 (bool_condition)
-
-
-State 99
-
-   22 if: IF '(' bool_condition ')' '{' . command '}'
-   23   | IF '(' bool_condition ')' '{' . command '}' ELSE '{' command '}'
-   24   | IF '(' bool_condition ')' '{' . command '}' ELSE command
-
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-
-    command       go to state 106
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
-
-
-State 100
-
-    8 command: command . command
-   25 if: IF '(' bool_condition ')' command . ELSE '{' command '}'
-   26   | IF '(' bool_condition ')' command .
-   27   | IF '(' bool_condition ')' command . ELSE command
-
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    ELSE    shift, and go to state 107
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-
-    VAR       [reduce using rule 26 (if)]
-    IF        [reduce using rule 26 (if)]
-    ELSE      [reduce using rule 26 (if)]
-    WHILE     [reduce using rule 26 (if)]
-    RETURN    [reduce using rule 26 (if)]
-    PRINT     [reduce using rule 26 (if)]
-    INC       [reduce using rule 26 (if)]
-    DEC       [reduce using rule 26 (if)]
-    $default  reduce using rule 26 (if)
-
-    command       go to state 38
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
-
-
-State 101
-
-   28 while: WHILE '(' bool_condition ')' '{' . command '}'
-
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-
-    command       go to state 108
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
-
-
-State 102
-
-    8 command: command . command
-   29 while: WHILE '(' bool_condition ')' command .
-
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-
-    VAR       [reduce using rule 29 (while)]
-    IF        [reduce using rule 29 (while)]
-    WHILE     [reduce using rule 29 (while)]
-    RETURN    [reduce using rule 29 (while)]
-    PRINT     [reduce using rule 29 (while)]
-    INC       [reduce using rule 29 (while)]
-    DEC       [reduce using rule 29 (while)]
-    $default  reduce using rule 29 (while)
-
-    command       go to state 38
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
-
-
-State 103
-
-   18 expr: '(' $@1 expr ')' .
+    INC  shift, and go to state 48
+    DEC  shift, and go to state 49
 
     $default  reduce using rule 18 (expr)
 
 
-State 104
+State 34
 
-   34 bool_help: NOT '(' VAR assign_operator . expr ')'
+   14 expr: INC . VAR
 
-    NUMBER  shift, and go to state 30
-    VAR     shift, and go to state 31
-    INC     shift, and go to state 32
-    DEC     shift, and go to state 33
-    '('     shift, and go to state 34
-
-    expr  go to state 109
+    VAR  shift, and go to state 50
 
 
-State 105
+State 35
 
-   32 bool_help: NOT '(' expr ')' .
+   15 expr: DEC . VAR
 
-    $default  reduce using rule 32 (bool_help)
+    VAR  shift, and go to state 51
 
 
-State 106
+State 36
 
-    8 command: command . command
-   22 if: IF '(' bool_condition ')' '{' command . '}'
-   23   | IF '(' bool_condition ')' '{' command . '}' ELSE '{' command '}'
-   24   | IF '(' bool_condition ')' '{' command . '}' ELSE command
+   21 expr: '(' . $@1 expr ')'
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-    '}'     shift, and go to state 110
+    $default  reduce using rule 20 ($@1)
 
-    command       go to state 38
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
+    $@1  go to state 52
 
 
-State 107
+State 37
 
-   25 if: IF '(' bool_condition ')' command ELSE . '{' command '}'
-   27   | IF '(' bool_condition ')' command ELSE . command
+   12 expr: expr . bin_opertr expr
+   13     | expr . comparison_operator expr
+   23 ret: RETURN expr .
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-    '{'     shift, and go to state 111
+    MORE_EQ       shift, and go to state 53
+    LESS_EQ       shift, and go to state 54
+    NOT_EQUAL     shift, and go to state 55
+    EQUAL_DOUBLE  shift, and go to state 56
+    PUSHL         shift, and go to state 57
+    PUSHR         shift, and go to state 58
+    MORE          shift, and go to state 59
+    LESS          shift, and go to state 60
+    AND           shift, and go to state 61
+    OR            shift, and go to state 62
+    AND_SINGLE    shift, and go to state 63
+    MINUS         shift, and go to state 64
+    PLUS          shift, and go to state 65
+    MULT          shift, and go to state 66
+    DIV           shift, and go to state 67
+    MOD           shift, and go to state 68
+    XOR           shift, and go to state 69
+    OR_SINGLE     shift, and go to state 70
 
-    command       go to state 112
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
+    $default  reduce using rule 23 (ret)
 
+    comparison_operator  go to state 71
+    bin_opertr           go to state 72
 
-State 108
 
-    8 command: command . command
-   28 while: WHILE '(' bool_condition ')' '{' command . '}'
+State 38
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-    '}'     shift, and go to state 113
+   22 print: PRINT '(' . expr ')'
 
-    command       go to state 38
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
+    NUMBER  shift, and go to state 32
+    VAR     shift, and go to state 33
+    INC     shift, and go to state 34
+    DEC     shift, and go to state 35
+    '('     shift, and go to state 36
 
+    expr  go to state 73
 
-State 109
 
-   10 expr: expr . bin_opertr expr
-   34 bool_help: NOT '(' VAR assign_operator expr . ')'
+State 39
 
-    PUSHL       shift, and go to state 57
-    PUSHR       shift, and go to state 58
-    AND_SINGLE  shift, and go to state 59
-    MINUS       shift, and go to state 60
-    PLUS        shift, and go to state 61
-    MULT        shift, and go to state 62
-    DIV         shift, and go to state 63
-    MOD         shift, and go to state 64
-    XOR         shift, and go to state 65
-    OR_SINGLE   shift, and go to state 66
-    ')'         shift, and go to state 114
+    3 command: assignment SEMICOLON .
 
-    bin_opertr  go to state 67
+    $default  reduce using rule 3 (command)
 
 
-State 110
+State 40
 
-   22 if: IF '(' bool_condition ')' '{' command '}' .
-   23   | IF '(' bool_condition ')' '{' command '}' . ELSE '{' command '}'
-   24   | IF '(' bool_condition ')' '{' command '}' . ELSE command
+    6 command: print SEMICOLON .
 
-    ELSE  shift, and go to state 115
+    $default  reduce using rule 6 (command)
 
-    ELSE      [reduce using rule 22 (if)]
-    $default  reduce using rule 22 (if)
 
+State 41
 
-State 111
+    7 command: ret SEMICOLON .
 
-   25 if: IF '(' bool_condition ')' command ELSE '{' . command '}'
+    $default  reduce using rule 7 (command)
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
 
-    command       go to state 116
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
+State 42
 
+    4 command: unary_opertr VAR . SEMICOLON
 
-State 112
+    SEMICOLON  shift, and go to state 74
 
-    8 command: command . command
-   27 if: IF '(' bool_condition ')' command ELSE command .
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
+State 43
 
-    VAR       [reduce using rule 27 (if)]
-    IF        [reduce using rule 27 (if)]
-    WHILE     [reduce using rule 27 (if)]
-    RETURN    [reduce using rule 27 (if)]
-    PRINT     [reduce using rule 27 (if)]
-    INC       [reduce using rule 27 (if)]
-    DEC       [reduce using rule 27 (if)]
-    $default  reduce using rule 27 (if)
+   10 assignment: VAR assign_operator expr .
+   12 expr: expr . bin_opertr expr
+   13     | expr . comparison_operator expr
 
-    command       go to state 38
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
+    MORE_EQ       shift, and go to state 53
+    LESS_EQ       shift, and go to state 54
+    NOT_EQUAL     shift, and go to state 55
+    EQUAL_DOUBLE  shift, and go to state 56
+    PUSHL         shift, and go to state 57
+    PUSHR         shift, and go to state 58
+    MORE          shift, and go to state 59
+    LESS          shift, and go to state 60
+    AND           shift, and go to state 61
+    OR            shift, and go to state 62
+    AND_SINGLE    shift, and go to state 63
+    MINUS         shift, and go to state 64
+    PLUS          shift, and go to state 65
+    MULT          shift, and go to state 66
+    DIV           shift, and go to state 67
+    MOD           shift, and go to state 68
+    XOR           shift, and go to state 69
+    OR_SINGLE     shift, and go to state 70
 
+    $default  reduce using rule 10 (assignment)
 
-State 113
+    comparison_operator  go to state 71
+    bin_opertr           go to state 72
 
-   28 while: WHILE '(' bool_condition ')' '{' command '}' .
 
-    $default  reduce using rule 28 (while)
+State 44
 
+    5 command: VAR unary_opertr SEMICOLON .
 
-State 114
+    $default  reduce using rule 5 (command)
 
-   34 bool_help: NOT '(' VAR assign_operator expr ')' .
-
-    $default  reduce using rule 34 (bool_help)
 
+State 45
 
-State 115
+   31 if: IF '(' expr2 . ')' $@2 body $@3 else
 
-   23 if: IF '(' bool_condition ')' '{' command '}' ELSE . '{' command '}'
-   24   | IF '(' bool_condition ')' '{' command '}' ELSE . command
+    ')'  shift, and go to state 75
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-    '{'     shift, and go to state 117
 
-    command       go to state 118
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
+State 46
 
+   11 expr2: expr .
+   12 expr: expr . bin_opertr expr
+   13     | expr . comparison_operator expr
 
-State 116
+    MORE_EQ       shift, and go to state 53
+    LESS_EQ       shift, and go to state 54
+    NOT_EQUAL     shift, and go to state 55
+    EQUAL_DOUBLE  shift, and go to state 56
+    PUSHL         shift, and go to state 57
+    PUSHR         shift, and go to state 58
+    MORE          shift, and go to state 59
+    LESS          shift, and go to state 60
+    AND           shift, and go to state 61
+    OR            shift, and go to state 62
+    AND_SINGLE    shift, and go to state 63
+    MINUS         shift, and go to state 64
+    PLUS          shift, and go to state 65
+    MULT          shift, and go to state 66
+    DIV           shift, and go to state 67
+    MOD           shift, and go to state 68
+    XOR           shift, and go to state 69
+    OR_SINGLE     shift, and go to state 70
 
-    8 command: command . command
-   25 if: IF '(' bool_condition ')' command ELSE '{' command . '}'
+    $default  reduce using rule 11 (expr2)
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-    '}'     shift, and go to state 119
+    comparison_operator  go to state 71
+    bin_opertr           go to state 72
 
-    command       go to state 38
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
 
+State 47
 
-State 117
+   34 while: WHILE $@4 '(' . expr2 ')' $@5 body
 
-   23 if: IF '(' bool_condition ')' '{' command '}' ELSE '{' . command '}'
+    NUMBER  shift, and go to state 32
+    VAR     shift, and go to state 33
+    INC     shift, and go to state 34
+    DEC     shift, and go to state 35
+    '('     shift, and go to state 36
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
+    expr2  go to state 76
+    expr   go to state 46
 
-    command       go to state 120
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
 
+State 48
 
-State 118
+   16 expr: VAR INC .
 
-    8 command: command . command
-   24 if: IF '(' bool_condition ')' '{' command '}' ELSE command .
+    $default  reduce using rule 16 (expr)
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
 
-    VAR       [reduce using rule 24 (if)]
-    IF        [reduce using rule 24 (if)]
-    WHILE     [reduce using rule 24 (if)]
-    RETURN    [reduce using rule 24 (if)]
-    PRINT     [reduce using rule 24 (if)]
-    INC       [reduce using rule 24 (if)]
-    DEC       [reduce using rule 24 (if)]
-    $default  reduce using rule 24 (if)
+State 49
 
-    command       go to state 38
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
+   17 expr: VAR DEC .
 
+    $default  reduce using rule 17 (expr)
 
-State 119
 
-   25 if: IF '(' bool_condition ')' command ELSE '{' command '}' .
+State 50
 
-    $default  reduce using rule 25 (if)
+   14 expr: INC VAR .
 
+    $default  reduce using rule 14 (expr)
 
-State 120
 
-    8 command: command . command
-   23 if: IF '(' bool_condition ')' '{' command '}' ELSE '{' command . '}'
+State 51
 
-    VAR     shift, and go to state 1
-    IF      shift, and go to state 2
-    WHILE   shift, and go to state 3
-    RETURN  shift, and go to state 4
-    PRINT   shift, and go to state 5
-    INC     shift, and go to state 6
-    DEC     shift, and go to state 7
-    '}'     shift, and go to state 121
+   15 expr: DEC VAR .
 
-    command       go to state 38
-    assignment    go to state 9
-    print         go to state 10
-    ret           go to state 11
-    if            go to state 12
-    while         go to state 13
-    unary_opertr  go to state 14
+    $default  reduce using rule 15 (expr)
 
 
-State 121
+State 52
 
-   23 if: IF '(' bool_condition ')' '{' command '}' ELSE '{' command '}' .
+   21 expr: '(' $@1 . expr ')'
 
-    $default  reduce using rule 23 (if)
+    NUMBER  shift, and go to state 32
+    VAR     shift, and go to state 33
+    INC     shift, and go to state 34
+    DEC     shift, and go to state 35
+    '('     shift, and go to state 36
+
+    expr  go to state 77
+
+
+State 53
+
+   48 comparison_operator: MORE_EQ .
+
+    $default  reduce using rule 48 (comparison_operator)
+
+
+State 54
+
+   49 comparison_operator: LESS_EQ .
+
+    $default  reduce using rule 49 (comparison_operator)
+
+
+State 55
+
+   47 comparison_operator: NOT_EQUAL .
+
+    $default  reduce using rule 47 (comparison_operator)
+
+
+State 56
+
+   46 comparison_operator: EQUAL_DOUBLE .
+
+    $default  reduce using rule 46 (comparison_operator)
+
+
+State 57
+
+   62 bin_opertr: PUSHL .
+
+    $default  reduce using rule 62 (bin_opertr)
+
+
+State 58
+
+   63 bin_opertr: PUSHR .
+
+    $default  reduce using rule 63 (bin_opertr)
+
+
+State 59
+
+   51 comparison_operator: MORE .
+
+    $default  reduce using rule 51 (comparison_operator)
+
+
+State 60
+
+   50 comparison_operator: LESS .
+
+    $default  reduce using rule 50 (comparison_operator)
+
+
+State 61
+
+   52 comparison_operator: AND .
+
+    $default  reduce using rule 52 (comparison_operator)
+
+
+State 62
+
+   53 comparison_operator: OR .
+
+    $default  reduce using rule 53 (comparison_operator)
+
+
+State 63
+
+   61 bin_opertr: AND_SINGLE .
+
+    $default  reduce using rule 61 (bin_opertr)
+
+
+State 64
+
+   54 bin_opertr: MINUS .
+
+    $default  reduce using rule 54 (bin_opertr)
+
+
+State 65
+
+   55 bin_opertr: PLUS .
+
+    $default  reduce using rule 55 (bin_opertr)
+
+
+State 66
+
+   56 bin_opertr: MULT .
+
+    $default  reduce using rule 56 (bin_opertr)
+
+
+State 67
+
+   57 bin_opertr: DIV .
+
+    $default  reduce using rule 57 (bin_opertr)
+
+
+State 68
+
+   58 bin_opertr: MOD .
+
+    $default  reduce using rule 58 (bin_opertr)
+
+
+State 69
+
+   59 bin_opertr: XOR .
+
+    $default  reduce using rule 59 (bin_opertr)
+
+
+State 70
+
+   60 bin_opertr: OR_SINGLE .
+
+    $default  reduce using rule 60 (bin_opertr)
+
+
+State 71
+
+   13 expr: expr comparison_operator . expr
+
+    NUMBER  shift, and go to state 32
+    VAR     shift, and go to state 33
+    INC     shift, and go to state 34
+    DEC     shift, and go to state 35
+    '('     shift, and go to state 36
+
+    expr  go to state 78
+
+
+State 72
+
+   12 expr: expr bin_opertr . expr
+
+    NUMBER  shift, and go to state 32
+    VAR     shift, and go to state 33
+    INC     shift, and go to state 34
+    DEC     shift, and go to state 35
+    '('     shift, and go to state 36
+
+    expr  go to state 79
+
+
+State 73
+
+   12 expr: expr . bin_opertr expr
+   13     | expr . comparison_operator expr
+   22 print: PRINT '(' expr . ')'
+
+    MORE_EQ       shift, and go to state 53
+    LESS_EQ       shift, and go to state 54
+    NOT_EQUAL     shift, and go to state 55
+    EQUAL_DOUBLE  shift, and go to state 56
+    PUSHL         shift, and go to state 57
+    PUSHR         shift, and go to state 58
+    MORE          shift, and go to state 59
+    LESS          shift, and go to state 60
+    AND           shift, and go to state 61
+    OR            shift, and go to state 62
+    AND_SINGLE    shift, and go to state 63
+    MINUS         shift, and go to state 64
+    PLUS          shift, and go to state 65
+    MULT          shift, and go to state 66
+    DIV           shift, and go to state 67
+    MOD           shift, and go to state 68
+    XOR           shift, and go to state 69
+    OR_SINGLE     shift, and go to state 70
+    ')'           shift, and go to state 80
+
+    comparison_operator  go to state 71
+    bin_opertr           go to state 72
+
+
+State 74
+
+    4 command: unary_opertr VAR SEMICOLON .
+
+    $default  reduce using rule 4 (command)
+
+
+State 75
+
+   31 if: IF '(' expr2 ')' . $@2 body $@3 else
+
+    $default  reduce using rule 29 ($@2)
+
+    $@2  go to state 81
+
+
+State 76
+
+   34 while: WHILE $@4 '(' expr2 . ')' $@5 body
+
+    ')'  shift, and go to state 82
+
+
+State 77
+
+   12 expr: expr . bin_opertr expr
+   13     | expr . comparison_operator expr
+   21     | '(' $@1 expr . ')'
+
+    MORE_EQ       shift, and go to state 53
+    LESS_EQ       shift, and go to state 54
+    NOT_EQUAL     shift, and go to state 55
+    EQUAL_DOUBLE  shift, and go to state 56
+    PUSHL         shift, and go to state 57
+    PUSHR         shift, and go to state 58
+    MORE          shift, and go to state 59
+    LESS          shift, and go to state 60
+    AND           shift, and go to state 61
+    OR            shift, and go to state 62
+    AND_SINGLE    shift, and go to state 63
+    MINUS         shift, and go to state 64
+    PLUS          shift, and go to state 65
+    MULT          shift, and go to state 66
+    DIV           shift, and go to state 67
+    MOD           shift, and go to state 68
+    XOR           shift, and go to state 69
+    OR_SINGLE     shift, and go to state 70
+    ')'           shift, and go to state 83
+
+    comparison_operator  go to state 71
+    bin_opertr           go to state 72
+
+
+State 78
+
+   12 expr: expr . bin_opertr expr
+   13     | expr . comparison_operator expr
+   13     | expr comparison_operator expr .
+
+    MORE_EQ       shift, and go to state 53
+    LESS_EQ       shift, and go to state 54
+    NOT_EQUAL     shift, and go to state 55
+    EQUAL_DOUBLE  shift, and go to state 56
+    PUSHL         shift, and go to state 57
+    PUSHR         shift, and go to state 58
+    MORE          shift, and go to state 59
+    LESS          shift, and go to state 60
+    AND           shift, and go to state 61
+    OR            shift, and go to state 62
+    AND_SINGLE    shift, and go to state 63
+    MINUS         shift, and go to state 64
+    PLUS          shift, and go to state 65
+    MULT          shift, and go to state 66
+    DIV           shift, and go to state 67
+    MOD           shift, and go to state 68
+    XOR           shift, and go to state 69
+    OR_SINGLE     shift, and go to state 70
+
+    MORE_EQ       [reduce using rule 13 (expr)]
+    LESS_EQ       [reduce using rule 13 (expr)]
+    NOT_EQUAL     [reduce using rule 13 (expr)]
+    EQUAL_DOUBLE  [reduce using rule 13 (expr)]
+    PUSHL         [reduce using rule 13 (expr)]
+    PUSHR         [reduce using rule 13 (expr)]
+    MORE          [reduce using rule 13 (expr)]
+    LESS          [reduce using rule 13 (expr)]
+    AND           [reduce using rule 13 (expr)]
+    OR            [reduce using rule 13 (expr)]
+    AND_SINGLE    [reduce using rule 13 (expr)]
+    MINUS         [reduce using rule 13 (expr)]
+    PLUS          [reduce using rule 13 (expr)]
+    MULT          [reduce using rule 13 (expr)]
+    DIV           [reduce using rule 13 (expr)]
+    MOD           [reduce using rule 13 (expr)]
+    XOR           [reduce using rule 13 (expr)]
+    OR_SINGLE     [reduce using rule 13 (expr)]
+    $default      reduce using rule 13 (expr)
+
+    comparison_operator  go to state 71
+    bin_opertr           go to state 72
+
+
+State 79
+
+   12 expr: expr . bin_opertr expr
+   12     | expr bin_opertr expr .
+   13     | expr . comparison_operator expr
+
+    MORE_EQ       shift, and go to state 53
+    LESS_EQ       shift, and go to state 54
+    NOT_EQUAL     shift, and go to state 55
+    EQUAL_DOUBLE  shift, and go to state 56
+    PUSHL         shift, and go to state 57
+    PUSHR         shift, and go to state 58
+    MORE          shift, and go to state 59
+    LESS          shift, and go to state 60
+    AND           shift, and go to state 61
+    OR            shift, and go to state 62
+    AND_SINGLE    shift, and go to state 63
+    MINUS         shift, and go to state 64
+    PLUS          shift, and go to state 65
+    MULT          shift, and go to state 66
+    DIV           shift, and go to state 67
+    MOD           shift, and go to state 68
+    XOR           shift, and go to state 69
+    OR_SINGLE     shift, and go to state 70
+
+    MORE_EQ       [reduce using rule 12 (expr)]
+    LESS_EQ       [reduce using rule 12 (expr)]
+    NOT_EQUAL     [reduce using rule 12 (expr)]
+    EQUAL_DOUBLE  [reduce using rule 12 (expr)]
+    PUSHL         [reduce using rule 12 (expr)]
+    PUSHR         [reduce using rule 12 (expr)]
+    MORE          [reduce using rule 12 (expr)]
+    LESS          [reduce using rule 12 (expr)]
+    AND           [reduce using rule 12 (expr)]
+    OR            [reduce using rule 12 (expr)]
+    AND_SINGLE    [reduce using rule 12 (expr)]
+    MINUS         [reduce using rule 12 (expr)]
+    PLUS          [reduce using rule 12 (expr)]
+    MULT          [reduce using rule 12 (expr)]
+    DIV           [reduce using rule 12 (expr)]
+    MOD           [reduce using rule 12 (expr)]
+    XOR           [reduce using rule 12 (expr)]
+    OR_SINGLE     [reduce using rule 12 (expr)]
+    $default      reduce using rule 12 (expr)
+
+    comparison_operator  go to state 71
+    bin_opertr           go to state 72
+
+
+State 80
+
+   22 print: PRINT '(' expr ')' .
+
+    $default  reduce using rule 22 (print)
+
+
+State 81
+
+   31 if: IF '(' expr2 ')' $@2 . body $@3 else
+
+    VAR     shift, and go to state 3
+    IF      shift, and go to state 4
+    WHILE   shift, and go to state 5
+    RETURN  shift, and go to state 6
+    PRINT   shift, and go to state 7
+    INC     shift, and go to state 8
+    DEC     shift, and go to state 9
+    '{'     shift, and go to state 84
+
+    command       go to state 85
+    assignment    go to state 11
+    print         go to state 12
+    ret           go to state 13
+    body          go to state 86
+    if            go to state 14
+    while         go to state 15
+    unary_opertr  go to state 16
+
+
+State 82
+
+   34 while: WHILE $@4 '(' expr2 ')' . $@5 body
+
+    $default  reduce using rule 33 ($@5)
+
+    $@5  go to state 87
+
+
+State 83
+
+   21 expr: '(' $@1 expr ')' .
+
+    $default  reduce using rule 21 (expr)
+
+
+State 84
+
+   25 body: '{' . commands '}'
+
+    $default  reduce using rule 1 (commands)
+
+    commands  go to state 88
+
+
+State 85
+
+   26 body: command .
+
+    $default  reduce using rule 26 (body)
+
+
+State 86
+
+   31 if: IF '(' expr2 ')' $@2 body . $@3 else
+
+    $default  reduce using rule 30 ($@3)
+
+    $@3  go to state 89
+
+
+State 87
+
+   34 while: WHILE $@4 '(' expr2 ')' $@5 . body
+
+    VAR     shift, and go to state 3
+    IF      shift, and go to state 4
+    WHILE   shift, and go to state 5
+    RETURN  shift, and go to state 6
+    PRINT   shift, and go to state 7
+    INC     shift, and go to state 8
+    DEC     shift, and go to state 9
+    '{'     shift, and go to state 84
+
+    command       go to state 85
+    assignment    go to state 11
+    print         go to state 12
+    ret           go to state 13
+    body          go to state 90
+    if            go to state 14
+    while         go to state 15
+    unary_opertr  go to state 16
+
+
+State 88
+
+    2 commands: commands . command
+   25 body: '{' commands . '}'
+
+    VAR     shift, and go to state 3
+    IF      shift, and go to state 4
+    WHILE   shift, and go to state 5
+    RETURN  shift, and go to state 6
+    PRINT   shift, and go to state 7
+    INC     shift, and go to state 8
+    DEC     shift, and go to state 9
+    '}'     shift, and go to state 91
+
+    command       go to state 10
+    assignment    go to state 11
+    print         go to state 12
+    ret           go to state 13
+    if            go to state 14
+    while         go to state 15
+    unary_opertr  go to state 16
+
+
+State 89
+
+   31 if: IF '(' expr2 ')' $@2 body $@3 . else
+
+    ELSE  shift, and go to state 92
+
+    ELSE      [reduce using rule 27 (else)]
+    $default  reduce using rule 27 (else)
+
+    else  go to state 93
+
+
+State 90
+
+   34 while: WHILE $@4 '(' expr2 ')' $@5 body .
+
+    $default  reduce using rule 34 (while)
+
+
+State 91
+
+   25 body: '{' commands '}' .
+
+    $default  reduce using rule 25 (body)
+
+
+State 92
+
+   28 else: ELSE . body
+
+    VAR     shift, and go to state 3
+    IF      shift, and go to state 4
+    WHILE   shift, and go to state 5
+    RETURN  shift, and go to state 6
+    PRINT   shift, and go to state 7
+    INC     shift, and go to state 8
+    DEC     shift, and go to state 9
+    '{'     shift, and go to state 84
+
+    command       go to state 85
+    assignment    go to state 11
+    print         go to state 12
+    ret           go to state 13
+    body          go to state 94
+    if            go to state 14
+    while         go to state 15
+    unary_opertr  go to state 16
+
+
+State 93
+
+   31 if: IF '(' expr2 ')' $@2 body $@3 else .
+
+    $default  reduce using rule 31 (if)
+
+
+State 94
+
+   28 else: ELSE body .
+
+    $default  reduce using rule 28 (else)
