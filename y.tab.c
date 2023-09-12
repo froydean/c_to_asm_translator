@@ -76,8 +76,6 @@
 	extern int yylineno;
 	extern int yylex();
 	bool num_error = 0;
-	
-	bool label_need = false;
 
 	//char * operato = {0x00};
 	std::string operato;
@@ -87,6 +85,11 @@
 	std::string cmp_op_n;
 	
 	int label_counter = 0;
+	int label_cycle = 0;
+	int cycle_count_total = 0;
+	int tmp82 = 0;
+	
+	std::stack <int> label_stack;
 
 	std::vector <std::string> express;
 
@@ -311,7 +314,10 @@
 		//cmp_op_n.clear();
 		
 		//label_counter
-		label_need = false;
+		//label_stack;
+		//label_cycle = 0;
+		//int tmp82
+		//int cycle_count_total = 0;
 	}
 	
 	void print_lol(){
@@ -319,7 +325,7 @@
 	}
 
 
-#line 323 "y.tab.c"
+#line 329 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -455,11 +461,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 254 "parser.yacc"
+#line 260 "parser.yacc"
 
 	char * string;
 
-#line 463 "y.tab.c"
+#line 469 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -838,13 +844,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   282,   282,   283,   286,   287,   288,   289,   290,   291,
-     292,   297,   300,   302,   303,   304,   305,   306,   307,   308,
-     309,   310,   310,   314,   317,   318,   337,   338,   341,   342,
-     345,   345,   345,   349,   349,   349,   354,   355,   356,   357,
-     358,   359,   360,   361,   362,   363,   364,   369,   370,   371,
-     372,   373,   374,   375,   376,   381,   382,   383,   384,   385,
-     386,   387,   388,   389,   390,   395,   396
+       0,   288,   288,   289,   293,   294,   295,   296,   297,   298,
+     299,   304,   307,   310,   311,   312,   313,   314,   315,   316,
+     317,   318,   318,   322,   325,   326,   330,   331,   334,   335,
+     340,   341,   340,   346,   347,   346,   353,   354,   355,   356,
+     357,   358,   359,   360,   361,   362,   363,   368,   369,   370,
+     371,   372,   373,   374,   375,   380,   381,   382,   383,   384,
+     385,   386,   387,   388,   389,   394,   395
 };
 #endif
 
@@ -1460,15 +1466,15 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
   switch (yytype)
     {
     case 3: /* NUMBER  */
-#line 261 "parser.yacc"
+#line 267 "parser.yacc"
             {free(((*yyvaluep).string));}
-#line 1466 "y.tab.c"
+#line 1472 "y.tab.c"
         break;
 
     case 4: /* VAR  */
-#line 260 "parser.yacc"
+#line 266 "parser.yacc"
             {free(((*yyvaluep).string));}
-#line 1472 "y.tab.c"
+#line 1478 "y.tab.c"
         break;
 
       default:
@@ -1736,349 +1742,350 @@ yyreduce:
   switch (yyn)
     {
   case 4:
-#line 286 "parser.yacc"
+#line 293 "parser.yacc"
                                      {clear_all();}
-#line 1742 "y.tab.c"
-    break;
-
-  case 5:
-#line 287 "parser.yacc"
-                                             {std::cout << unary_operator << " " << (yyvsp[-1].string) << std::endl; clear_all();}
 #line 1748 "y.tab.c"
     break;
 
-  case 6:
-#line 288 "parser.yacc"
-                                             {std::cout << unary_operator << " " << (yyvsp[-2].string) << std::endl;  clear_all();}
+  case 5:
+#line 294 "parser.yacc"
+                                             {std::cout << unary_operator << " " << (yyvsp[-1].string) << std::endl; clear_all();}
 #line 1754 "y.tab.c"
     break;
 
-  case 7:
-#line 289 "parser.yacc"
-                                  {clear_all();}
+  case 6:
+#line 295 "parser.yacc"
+                                             {std::cout << unary_operator << " " << (yyvsp[-2].string) << std::endl;  clear_all();}
 #line 1760 "y.tab.c"
     break;
 
-  case 8:
-#line 290 "parser.yacc"
-                                {clear_all();}
+  case 7:
+#line 296 "parser.yacc"
+                                  {clear_all();}
 #line 1766 "y.tab.c"
     break;
 
-  case 9:
-#line 291 "parser.yacc"
-                     {clear_all();}
+  case 8:
+#line 297 "parser.yacc"
+                                {clear_all();}
 #line 1772 "y.tab.c"
     break;
 
-  case 10:
-#line 292 "parser.yacc"
-                        {clear_all();}
+  case 9:
+#line 298 "parser.yacc"
+                     {clear_all();}
 #line 1778 "y.tab.c"
     break;
 
-  case 11:
-#line 297 "parser.yacc"
-                                         { print_expr(); print_equal((yyvsp[-2].string)); printf("POP %s\n", (yyvsp[-2].string));}
+  case 10:
+#line 299 "parser.yacc"
+                        {clear_all();}
 #line 1784 "y.tab.c"
     break;
 
-  case 12:
-#line 300 "parser.yacc"
-             {print_expr(); clear_all();}
+  case 11:
+#line 304 "parser.yacc"
+                                         { print_expr(); print_equal((yyvsp[-2].string)); printf("POP %s\n", (yyvsp[-2].string));}
 #line 1790 "y.tab.c"
     break;
 
-  case 15:
-#line 304 "parser.yacc"
-                  {express.push_back("INC"); express.push_back((yyvsp[0].string)); }
+  case 12:
+#line 307 "parser.yacc"
+             {print_expr(); clear_all();}
 #line 1796 "y.tab.c"
     break;
 
-  case 16:
-#line 305 "parser.yacc"
-                  {express.push_back("DEC"); express.push_back((yyvsp[0].string)); }
+  case 15:
+#line 312 "parser.yacc"
+                  {express.push_back("INC"); express.push_back((yyvsp[0].string)); }
 #line 1802 "y.tab.c"
     break;
 
-  case 17:
-#line 306 "parser.yacc"
-                  {express.push_back((yyvsp[-1].string)); express.push_back("INC"); }
+  case 16:
+#line 313 "parser.yacc"
+                  {express.push_back("DEC"); express.push_back((yyvsp[0].string)); }
 #line 1808 "y.tab.c"
     break;
 
-  case 18:
-#line 307 "parser.yacc"
-                  {express.push_back((yyvsp[-1].string)); express.push_back("DEC"); }
+  case 17:
+#line 314 "parser.yacc"
+                  {express.push_back((yyvsp[-1].string)); express.push_back("INC"); }
 #line 1814 "y.tab.c"
     break;
 
-  case 19:
-#line 308 "parser.yacc"
-              {ex_push_back((yyvsp[0].string));}
+  case 18:
+#line 315 "parser.yacc"
+                  {express.push_back((yyvsp[-1].string)); express.push_back("DEC"); }
 #line 1820 "y.tab.c"
     break;
 
-  case 20:
-#line 309 "parser.yacc"
-                 {ex_push_back((yyvsp[0].string));}
+  case 19:
+#line 316 "parser.yacc"
+              {ex_push_back((yyvsp[0].string));}
 #line 1826 "y.tab.c"
     break;
 
-  case 21:
-#line 310 "parser.yacc"
-              {express.push_back("(");}
+  case 20:
+#line 317 "parser.yacc"
+                 {ex_push_back((yyvsp[0].string));}
 #line 1832 "y.tab.c"
     break;
 
-  case 22:
-#line 310 "parser.yacc"
-                                                 {express.push_back(")");}
+  case 21:
+#line 318 "parser.yacc"
+              {express.push_back("(");}
 #line 1838 "y.tab.c"
     break;
 
-  case 23:
-#line 314 "parser.yacc"
-                               {print_expr(); printf("PRINT\n");}
+  case 22:
+#line 318 "parser.yacc"
+                                                 {express.push_back(")");}
 #line 1844 "y.tab.c"
     break;
 
-  case 24:
-#line 317 "parser.yacc"
-                        {print_expr(); printf("RET\n");}
+  case 23:
+#line 322 "parser.yacc"
+                               {print_expr(); printf("PRINT\n");}
 #line 1850 "y.tab.c"
     break;
 
-  case 25:
-#line 318 "parser.yacc"
-                    {printf("RET\n");}
+  case 24:
+#line 325 "parser.yacc"
+                        {print_expr(); printf("RET\n");}
 #line 1856 "y.tab.c"
     break;
 
-  case 30:
-#line 345 "parser.yacc"
-                         {print_lol();}
+  case 25:
+#line 326 "parser.yacc"
+                    {printf("RET\n");}
 #line 1862 "y.tab.c"
     break;
 
-  case 31:
-#line 345 "parser.yacc"
-                                             {std::cout << "JMP .L"<< label_counter<< std::endl << ".L" << label_counter-1 << std::endl;}
+  case 30:
+#line 340 "parser.yacc"
+                         {print_lol(); label_counter++; label_stack.push(label_counter-1);}
 #line 1868 "y.tab.c"
     break;
 
+  case 31:
+#line 341 "parser.yacc"
+             { tmp82 = label_stack.top(); label_stack.pop();
+	std::cout << "JMP .L"<< tmp82 << std::endl << ".L" << tmp82 -1 << std::endl;}
+#line 1875 "y.tab.c"
+    break;
+
   case 32:
-#line 345 "parser.yacc"
-                                                                                                                                               {std::cout << ".L" << label_counter++ << std::endl;}
-#line 1874 "y.tab.c"
+#line 342 "parser.yacc"
+                                                                                           {std::cout << ".L" << tmp82 << std::endl;}
+#line 1881 "y.tab.c"
     break;
 
   case 33:
-#line 349 "parser.yacc"
-              {std::cout << ".L" << label_counter++ << std::endl;}
-#line 1880 "y.tab.c"
+#line 346 "parser.yacc"
+              {std::cout << ".cycle" << cycle_count_total << std::endl; cycle_count_total++; label_cycle = 0;}
+#line 1887 "y.tab.c"
     break;
 
   case 34:
-#line 349 "parser.yacc"
-                                                                                 {print_lol();}
-#line 1886 "y.tab.c"
+#line 347 "parser.yacc"
+                      {print_lol(); label_stack.push(label_counter-1);}
+#line 1893 "y.tab.c"
     break;
 
   case 35:
-#line 349 "parser.yacc"
-                                                                                                     {std::cout << "JMP .L" <<label_counter-4 << std::endl<<".L" << label_counter-1 << std::endl;}
-#line 1892 "y.tab.c"
+#line 348 "parser.yacc"
+             { int tmp81 = label_stack.top(); label_stack.pop(); std::cout << "JMP .cycle" << cycle_count_total - label_cycle - 1 << std::endl<<".L" << tmp81 << std::endl; label_cycle++;}
+#line 1899 "y.tab.c"
     break;
 
   case 36:
-#line 354 "parser.yacc"
+#line 353 "parser.yacc"
                               {operato = "equal";}
-#line 1898 "y.tab.c"
+#line 1905 "y.tab.c"
     break;
 
   case 37:
-#line 355 "parser.yacc"
+#line 354 "parser.yacc"
                                  {operato = "add_eq";}
-#line 1904 "y.tab.c"
+#line 1911 "y.tab.c"
     break;
 
   case 38:
-#line 356 "parser.yacc"
+#line 355 "parser.yacc"
                                  {operato = "sub_eq";}
-#line 1910 "y.tab.c"
+#line 1917 "y.tab.c"
     break;
 
   case 39:
-#line 357 "parser.yacc"
+#line 356 "parser.yacc"
                                   {operato = "mult_eq";}
-#line 1916 "y.tab.c"
+#line 1923 "y.tab.c"
     break;
 
   case 40:
-#line 358 "parser.yacc"
+#line 357 "parser.yacc"
                                  {operato = "div_eq";}
-#line 1922 "y.tab.c"
+#line 1929 "y.tab.c"
     break;
 
   case 41:
-#line 359 "parser.yacc"
+#line 358 "parser.yacc"
                                  {operato = "mod_eq";}
-#line 1928 "y.tab.c"
+#line 1935 "y.tab.c"
     break;
 
   case 42:
-#line 360 "parser.yacc"
+#line 359 "parser.yacc"
                                    {operato = "pushl_eq";}
-#line 1934 "y.tab.c"
+#line 1941 "y.tab.c"
     break;
 
   case 43:
-#line 361 "parser.yacc"
+#line 360 "parser.yacc"
                                    {operato = "pushr_eq";}
-#line 1940 "y.tab.c"
+#line 1947 "y.tab.c"
     break;
 
   case 44:
-#line 362 "parser.yacc"
+#line 361 "parser.yacc"
                                  {operato = "xor_eq";}
-#line 1946 "y.tab.c"
+#line 1953 "y.tab.c"
     break;
 
   case 45:
-#line 363 "parser.yacc"
+#line 362 "parser.yacc"
                                 {operato = "or_eq";}
-#line 1952 "y.tab.c"
+#line 1959 "y.tab.c"
     break;
 
   case 46:
-#line 364 "parser.yacc"
+#line 363 "parser.yacc"
                                  {operato = "and_eq";}
-#line 1958 "y.tab.c"
+#line 1965 "y.tab.c"
     break;
 
   case 47:
-#line 369 "parser.yacc"
+#line 368 "parser.yacc"
                                      {express.push_back("JE");}
-#line 1964 "y.tab.c"
+#line 1971 "y.tab.c"
     break;
 
   case 48:
-#line 370 "parser.yacc"
+#line 369 "parser.yacc"
                                     {express.push_back("JNE");}
-#line 1970 "y.tab.c"
+#line 1977 "y.tab.c"
     break;
 
   case 49:
-#line 371 "parser.yacc"
+#line 370 "parser.yacc"
                                   {express.push_back("JGE");}
-#line 1976 "y.tab.c"
+#line 1983 "y.tab.c"
     break;
 
   case 50:
-#line 372 "parser.yacc"
+#line 371 "parser.yacc"
                                   {express.push_back("JLE");}
-#line 1982 "y.tab.c"
+#line 1989 "y.tab.c"
     break;
 
   case 51:
-#line 373 "parser.yacc"
+#line 372 "parser.yacc"
                                {express.push_back("JL");}
-#line 1988 "y.tab.c"
+#line 1995 "y.tab.c"
     break;
 
   case 52:
-#line 374 "parser.yacc"
+#line 373 "parser.yacc"
                                {express.push_back("JG");}
-#line 1994 "y.tab.c"
+#line 2001 "y.tab.c"
     break;
 
   case 53:
-#line 375 "parser.yacc"
+#line 374 "parser.yacc"
                               {express.push_back("CMP_AND");}
-#line 2000 "y.tab.c"
+#line 2007 "y.tab.c"
     break;
 
   case 54:
-#line 376 "parser.yacc"
+#line 375 "parser.yacc"
                              {express.push_back("CMP_OR");}
-#line 2006 "y.tab.c"
+#line 2013 "y.tab.c"
     break;
 
   case 55:
-#line 381 "parser.yacc"
+#line 380 "parser.yacc"
                       {express.push_back("SUB");}
-#line 2012 "y.tab.c"
+#line 2019 "y.tab.c"
     break;
 
   case 56:
-#line 382 "parser.yacc"
+#line 381 "parser.yacc"
                        {express.push_back("ADD");}
-#line 2018 "y.tab.c"
+#line 2025 "y.tab.c"
     break;
 
   case 57:
-#line 383 "parser.yacc"
+#line 382 "parser.yacc"
                        {express.push_back("MULT");}
-#line 2024 "y.tab.c"
+#line 2031 "y.tab.c"
     break;
 
   case 58:
-#line 384 "parser.yacc"
+#line 383 "parser.yacc"
                       {express.push_back("DIV");}
-#line 2030 "y.tab.c"
+#line 2037 "y.tab.c"
     break;
 
   case 59:
-#line 385 "parser.yacc"
+#line 384 "parser.yacc"
                       {express.push_back("MOD");}
-#line 2036 "y.tab.c"
+#line 2043 "y.tab.c"
     break;
 
   case 60:
-#line 386 "parser.yacc"
+#line 385 "parser.yacc"
                       {express.push_back("XOR");}
-#line 2042 "y.tab.c"
+#line 2049 "y.tab.c"
     break;
 
   case 61:
-#line 387 "parser.yacc"
+#line 386 "parser.yacc"
                             {express.push_back("OR");}
-#line 2048 "y.tab.c"
+#line 2055 "y.tab.c"
     break;
 
   case 62:
-#line 388 "parser.yacc"
+#line 387 "parser.yacc"
                              {express.push_back("AND");}
-#line 2054 "y.tab.c"
+#line 2061 "y.tab.c"
     break;
 
   case 63:
-#line 389 "parser.yacc"
+#line 388 "parser.yacc"
                         {express.push_back("PUSHL");}
-#line 2060 "y.tab.c"
+#line 2067 "y.tab.c"
     break;
 
   case 64:
-#line 390 "parser.yacc"
+#line 389 "parser.yacc"
                         {express.push_back("PUSHR");}
-#line 2066 "y.tab.c"
+#line 2073 "y.tab.c"
     break;
 
   case 65:
-#line 395 "parser.yacc"
+#line 394 "parser.yacc"
                     {unary_operator = "INC";}
-#line 2072 "y.tab.c"
+#line 2079 "y.tab.c"
     break;
 
   case 66:
-#line 396 "parser.yacc"
+#line 395 "parser.yacc"
                      {unary_operator ="DEC";}
-#line 2078 "y.tab.c"
+#line 2085 "y.tab.c"
     break;
 
 
-#line 2082 "y.tab.c"
+#line 2089 "y.tab.c"
 
       default: break;
     }
@@ -2310,7 +2317,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 399 "parser.yacc"
+#line 398 "parser.yacc"
 
 
 

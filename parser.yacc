@@ -7,8 +7,6 @@
 	extern int yylineno;
 	extern int yylex();
 	bool num_error = 0;
-	
-	bool label_need = false;
 
 	//char * operato = {0x00};
 	std::string operato;
@@ -18,6 +16,11 @@
 	std::string cmp_op_n;
 	
 	int label_counter = 0;
+	int label_cycle = 0;
+	int cycle_count_total = 0;
+	int tmp82 = 0;
+	
+	std::stack <int> label_stack;
 
 	std::vector <std::string> express;
 
@@ -242,7 +245,10 @@
 		//cmp_op_n.clear();
 		
 		//label_counter
-		label_need = false;
+		//label_stack;
+		//label_cycle = 0;
+		//int tmp82
+		//int cycle_count_total = 0;
 	}
 	
 	void print_lol(){
@@ -281,6 +287,7 @@ Specific of this compilater:
 
 commands:
 	| commands command
+	;
 
 command:
 		assignment SEMICOLON {clear_all();}
@@ -298,6 +305,7 @@ assignment:
 		;
 expr2:
 	expr {print_expr(); clear_all();}
+	;
 expr: 
 	expr bin_opertr expr
 	|expr comparison_operator expr
@@ -317,21 +325,6 @@ ret:
             RETURN expr {print_expr(); printf("RET\n");} //RET - returns top of the stack
             |RETURN {printf("RET\n");}
             ;
-/*
-//no need to be count operators after missing brackets bc it still right to syntax
-if:    IF '(' expr ')' '{' command '}' 
-            | IF '(' expr ')' '{' command '}' ELSE '{' command '}'
-            | IF '(' expr ')' '{' command '}' ELSE command
-            | IF '(' expr ')' command ELSE '{' command '}'
-            | IF '(' expr ')'   command 
-            | IF '(' expr ')'  command ELSE command
-            ;
-
-while: 
-            WHILE '(' expr ')' '{' command '}'
-            | WHILE '('  expr  ')' command
-            ;
-*/
 
 body:
 	'{' commands '}'
@@ -340,13 +333,19 @@ body:
 
 else: 
 	| ELSE body
-	
+	;
+
+//print_lol() std::cout<<"CMP [stack_top], 1"<< std::endl<< "JL .L" << label_counter++ << std::endl;
 if:
-	IF '(' expr2 ')' {print_lol();} body {std::cout << "JMP .L"<< label_counter<< std::endl << ".L" << label_counter-1 << std::endl;} else {std::cout << ".L" << label_counter++ << std::endl;}
+	IF '(' expr2 ')' {print_lol(); label_counter++; label_stack.push(label_counter-1);}
+	body { tmp82 = label_stack.top(); label_stack.pop();
+	std::cout << "JMP .L"<< tmp82 << std::endl << ".L" << tmp82 -1 << std::endl;} else {std::cout << ".L" << tmp82 << std::endl;}
 	;
 
 while:
-	WHILE {std::cout << ".L" << label_counter++ << std::endl;} '(' expr2 ')' {print_lol();} body {std::cout << "JMP .L" <<label_counter-4 << std::endl<<".L" << label_counter-1 << std::endl;}
+	WHILE {std::cout << ".cycle" << cycle_count_total << std::endl; cycle_count_total++; label_cycle = 0;}
+	'(' expr2 ')' {print_lol(); label_stack.push(label_counter-1);}
+	body { int tmp81 = label_stack.top(); label_stack.pop(); std::cout << "JMP .cycle" << cycle_count_total - label_cycle - 1 << std::endl<<".L" << tmp81 << std::endl; label_cycle++;}
 	;
 
 assign_operator:
